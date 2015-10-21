@@ -1,11 +1,15 @@
 package com.asoee.smartdrive;
 
 import android.app.Activity;
+import android.gesture.Gesture;
+import android.gesture.GestureLibraries;
+import android.gesture.GestureLibrary;
+import android.gesture.GestureOverlayView;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainWindow extends Activity {
+public class MainWindow extends Activity implements GestureOverlayView.OnGesturePerformedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,5 +37,12 @@ public class MainWindow extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    //Something must be done here i guess
+    @Override
+    public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+
     }
 }
