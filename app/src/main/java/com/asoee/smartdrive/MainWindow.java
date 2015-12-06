@@ -65,7 +65,12 @@ public class MainWindow extends Activity {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             ArrayList<String> thingsYouSaid = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
-            System.out.println("such wow");
+
+            //Currently not convenient, will be refined
+            try {
+                Object executor = Class.forName(voiceResult.getKeyword()).getConstructor(String.class)
+                        .newInstance(new Object[]{voiceResult});
+            }catch (Exception ignore){}
         }
     }
 
