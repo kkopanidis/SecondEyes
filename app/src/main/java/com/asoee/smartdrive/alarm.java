@@ -8,7 +8,7 @@ public class alarm {
      * @param sentence the sentence given
      */
     public alarm(String sentence){
-
+        System.out.println("Fuck off");
     }
 
 }
