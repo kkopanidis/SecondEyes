@@ -2,7 +2,7 @@ package com.asoee.smartdrive;
 
 import android.content.Intent;
 
-public class map extends Action {
+public class Map extends Action {
 
     /**
      * Does constructor stuff
