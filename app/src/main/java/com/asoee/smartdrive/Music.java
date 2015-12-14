@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-public class music extends Action {
+public class Music extends Action {
 
     String songToPlay;
     String artistToPlay;
@@ -36,7 +36,7 @@ public class music extends Action {
      * Does constructor stuff
      * @param sentence the sentence given
      */
-    public music(String sentence){
+    public Music(String sentence){
         super(sentence);
         music = new HashMap<>();
         analyzeSentence();
