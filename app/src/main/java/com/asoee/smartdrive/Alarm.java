@@ -8,7 +8,7 @@ public class alarm extends Action {
      * Does constructor stuff
      * @param sentence the sentence given
      */
-    public alarm(String sentence){
+    public Alarm(String sentence){
         super(sentence);
     }
 
