@@ -2,7 +2,7 @@ package com.asoee.smartdrive;
 
 import android.content.Intent;
 
-public class alarm extends Action {
+public class Alarm extends Action {
 
     /**
      * Does constructor stuff
