@@ -32,34 +32,28 @@ public class Message extends Action {
     protected void analyzeSentence() {
         getContacts();
         sentence = sentence.toLowerCase().trim();
+        String[] tokens = sentence.split("\\s");
         int token;
-        String first = sentence.substring(0, token = sentence.indexOf(' ')).trim();
-        String second, third;
-        String last = sentence.substring(sentence.lastIndexOf(' '), sentence.length()).trim();
-        if (sentence.indexOf(token, ' ') > 0) {
-            second = sentence.substring(token, token = sentence.indexOf(token, ' ')).trim();
+        String first = tokens[0].trim();
+        String second = " ";
+        String third = " ";
+        String last = tokens[tokens.length - 1].trim();
+        if (tokens.length > 1)
+            second = tokens[1].trim();
+        if (tokens.length > 2)
+            third = tokens[2].trim();
 
-        }else{
-            second = sentence.substring(token, sentence.length()).trim();
-        }
-
-        if (sentence.indexOf(token, ' ') > 0) {
-            third = sentence.substring(token, sentence.indexOf(token, ' ')).trim();
-
-        }else{
-            third = sentence.substring(token, sentence.length()).trim();
-        }
         switch (first) {
             case "message":
                 if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence.substring(sentence.indexOf(third), sentence.length());
+                    message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
                     contact_name = third;
                 } else if (contacts.containsKey(second)) {
-                    message = sentence.substring(sentence.indexOf(second), sentence.length());
+                    message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
                     contact_name = second;
                 } else if (contacts.containsKey(last)) {
                     sentence = sentence.substring("message".length(), sentence.indexOf(last)).trim();
-                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).equals("to")) {
+                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
                         sentence = sentence.substring(0, sentence.lastIndexOf(' ')).trim();
                     }
 
@@ -72,17 +66,16 @@ public class Message extends Action {
                 break;
             case "send":
                 if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence.substring(sentence.indexOf(third), sentence.length());
+                    message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
                     contact_name = third;
                 } else if (contacts.containsKey(second)) {
-                    message = sentence.substring(sentence.indexOf(second), sentence.length());
+                    message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
                     contact_name = second;
                 } else if (contacts.containsKey(last)) {
                     sentence = sentence.substring("send".length(), sentence.indexOf(last)).trim();
-                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).equals("to")) {
+                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
                         sentence = sentence.substring(0, sentence.lastIndexOf(' ')).trim();
                     }
-
                     message = sentence;
                     contact_name = last;
                 } else {
@@ -92,14 +85,14 @@ public class Message extends Action {
                 break;
             case "text":
                 if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence.substring(sentence.indexOf(third), sentence.length());
+                    message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
                     contact_name = third;
                 } else if (contacts.containsKey(second)) {
-                    message = sentence.substring(sentence.indexOf(second), sentence.length());
+                    message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
                     contact_name = second;
                 } else if (contacts.containsKey(last)) {
                     sentence = sentence.substring("text".length(), sentence.indexOf(last)).trim();
-                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).equals("to")) {
+                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
                         sentence = sentence.substring(0, sentence.lastIndexOf(' ')).trim();
                     }
 
