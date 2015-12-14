@@ -8,7 +8,7 @@ public class map extends Action {
      * Does constructor stuff
      * @param sentence the sentence given
      */
-    public map(String sentence){
+    public Map(String sentence){
         super(sentence);
     }
 
