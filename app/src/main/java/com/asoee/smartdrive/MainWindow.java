@@ -68,15 +68,32 @@ public class MainWindow extends Activity {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             ArrayList<String> thingsYouSaid = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
+            if (voiceResult == null)
+                return;
 
             //Currently not convenient, will be refined
-            try {
-                Action action = (Action) Class.forName(voiceResult.getKeyword()).getConstructor(String.class)
-                        .newInstance(voiceResult); //risky //-> why object array?
-                //a simple switch will be safer
-
-                startActivity(action.executeCommandIntent()); //get the intent for executing the command
-            } catch (Exception ignore){ }
+            Action action;
+            switch (voiceResult.getKeyword()) {
+                case "message":
+                    action = new Message(voiceResult.getSentence());
+                    break;
+                case "music":
+                    action = new Music(voiceResult.getSentence());
+                    break;
+                case "map":
+                    action = new Map(voiceResult.getSentence());
+                    break;
+                case "alarm":
+                    action = new Alarm(voiceResult.getSentence());
+                    break;
+                case "call":
+                    action = new Call(voiceResult.getSentence());
+                    break;
+                default:
+                    break;
+            }
+            voiceResult = null;
+            //startActivity(action.executeCommandIntent()); //get the intent for executing the command
         }
     }
 
