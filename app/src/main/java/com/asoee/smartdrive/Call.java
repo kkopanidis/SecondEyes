@@ -2,7 +2,7 @@ package com.asoee.smartdrive;
 
 import android.content.Intent;
 
-public class call extends Action {
+public class Call extends Action {
 
     /**
      * Does constructor stuff
