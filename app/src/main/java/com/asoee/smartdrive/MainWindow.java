@@ -1,6 +1,7 @@
 package com.asoee.smartdrive;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -18,12 +19,14 @@ import java.util.HashMap;
 public class MainWindow extends Activity {
 
     HashMap<String, String> keywords;
+    static Context active_context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_window);
         keywords = new HashMap<>();
+        active_context = this;
         populateMap();
     }
 
