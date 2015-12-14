@@ -8,7 +8,7 @@ public class call extends Action {
      * Does constructor stuff
      * @param sentence the sentence given
      */
-    public call(String sentence){
+    public Call(String sentence){
         super(sentence);
     }
 
