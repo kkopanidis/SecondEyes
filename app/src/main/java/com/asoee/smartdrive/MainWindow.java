@@ -68,9 +68,12 @@ public class MainWindow extends Activity {
 
             //Currently not convenient, will be refined
             try {
-                Object executor = Class.forName(voiceResult.getKeyword()).getConstructor(String.class)
-                        .newInstance(new Object[]{voiceResult});
-            }catch (Exception ignore){}
+                Action action = (Action) Class.forName(voiceResult.getKeyword()).getConstructor(String.class)
+                        .newInstance(voiceResult); //risky //-> why object array?
+                //a simple switch will be safer
+
+                startActivity(action.executeCommandIntent()); //get the intent for executing the command
+            } catch (Exception ignore){ }
         }
     }
 
