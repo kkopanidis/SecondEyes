@@ -1,14 +1,25 @@
 package com.asoee.smartdrive;
 
-public class alarm {
-    String sentence;
+import android.content.Intent;
+
+public class alarm extends Action {
 
     /**
      * Does constructor stuff
      * @param sentence the sentence given
      */
     public alarm(String sentence){
-        System.out.println("Fuck off");
+        super(sentence);
+    }
+
+    @Override
+    protected void analyzeSentence() {
+
+    }
+
+    @Override
+    public Intent executeCommandIntent() {
+        return null;
     }
 
 }
