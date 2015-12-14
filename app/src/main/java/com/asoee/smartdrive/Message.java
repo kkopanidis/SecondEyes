@@ -8,7 +8,7 @@ public class message extends Action {
      * Does constructor stuff
      * @param sentence the sentence given
      */
-    public message(String sentence){
+    public Message(String sentence){
         super(sentence);
     }
 
