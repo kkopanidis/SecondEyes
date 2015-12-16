@@ -6,9 +6,10 @@ public class Map extends Action {
 
     /**
      * Does constructor stuff
+     *
      * @param sentence the sentence given
      */
-    public Map(String sentence){
+    public Map(String sentence) {
         super(sentence);
     }
 
@@ -18,7 +19,7 @@ public class Map extends Action {
     }
 
     @Override
-    public Intent executeCommandIntent() {
-        return null;
+    public void executeCommand() {
+
     }
 }

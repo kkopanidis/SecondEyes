@@ -9,9 +9,10 @@ public abstract class Action {
 
     /**
      * Does constructor stuff
+     *
      * @param sentence the sentence given
      */
-    public Action(String sentence){
+    public Action(String sentence) {
         this.sentence = sentence;
         analyzeSentence();
     }
@@ -24,6 +25,6 @@ public abstract class Action {
     /**
      * Executes the finally retrieved command.
      */
-    public abstract Intent executeCommandIntent();
+    public abstract void executeCommand();
 
 }

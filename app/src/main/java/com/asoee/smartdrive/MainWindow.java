@@ -20,17 +20,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class MainWindow extends Activity implements TextToSpeech.OnInitListener{
+public class MainWindow extends Activity implements TextToSpeech.OnInitListener {
 
     HashMap<String, String> keywords;
     static Context active_context;
+    static MainWindow activity;
     private TextToSpeech mTts;
+    private boolean locked = false;
+    private Action action;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_window);
         keywords = new HashMap<>();
+        activity = this;
         active_context = this;
         populateMap();
         Intent checkIntent = new Intent();
@@ -59,6 +63,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener{
 
         return super.onOptionsItemSelected(item);
     }
+
     public void onClickSpeechDetection(View view) {
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
@@ -89,12 +94,23 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener{
         }
         if (requestCode == 1 && resultCode == RESULT_OK) {
             ArrayList<String> thingsYouSaid = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            //Retrieve the user's answer to the approval
+            if (action != null)
+                for (String answer : thingsYouSaid) {
+                    if (answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("ok")) {
+                        action.executeCommand();
+                        action = null;
+                        return;
+                    } else {
+                        action = null;
+                        return;
+                    }
+                }
             VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
             if (voiceResult == null)
                 return;
-
+            locked = true;
             //Currently not convenient, will be refined
-            Action action;
             switch (voiceResult.getKeyword()) {
                 case "message":
                     action = new Message(voiceResult.getSentence());
@@ -115,6 +131,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener{
                     break;
             }
             voiceResult = null;
+
             //startActivity(action.executeCommandIntent()); //get the intent for executing the command
         }
     }
@@ -159,8 +176,22 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener{
 
     @Override
     public void onInit(int status) {
-        if(status == TextToSpeech.SUCCESS){
-            mTts.speak("Welcome to Blind Assist, i am skynet and i seek to dominate you",TextToSpeech.QUEUE_FLUSH, null, null);
+        if (status == TextToSpeech.SUCCESS) {
+            mTts.speak("Welcome to Blind Assist, i am skynet and i seek to dominate you",
+                    TextToSpeech.QUEUE_FLUSH, null, null);
+        }
+    }
+
+    public void approveAction(String approval_request) {
+        mTts.speak(approval_request,
+                TextToSpeech.QUEUE_FLUSH, null, null);
+
+        Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+        try {
+            startActivityForResult(i, 1);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error initializing speech to text engine.", Toast.LENGTH_LONG).show();
         }
     }
 }

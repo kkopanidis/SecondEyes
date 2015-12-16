@@ -25,7 +25,8 @@ public class Message extends Action {
 
             return;
         }
-        textMeMaybe();
+        MainWindow.activity.approveAction("I will text: " + contact_name + " " + message
+                + "  is that correct?");
     }
 
     @Override
@@ -109,8 +110,9 @@ public class Message extends Action {
     }
 
     @Override
-    public Intent executeCommandIntent() {
-        return null;
+    public void executeCommand() {
+        SmsManager.getDefault().sendTextMessage(contacts.get(contact_name),
+                null, message, null, null);
     }
 
     void getContacts() {
@@ -123,11 +125,6 @@ public class Message extends Action {
         }
 
         contacts.close();
-    }
-
-    private void textMeMaybe() {
-        SmsManager.getDefault().sendTextMessage(contacts.get(contact_name),
-                null, message, null, null);
     }
 
 }

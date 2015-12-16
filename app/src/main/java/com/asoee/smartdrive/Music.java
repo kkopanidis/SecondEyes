@@ -34,9 +34,10 @@ public class Music extends Action {
 
     /**
      * Does constructor stuff
+     *
      * @param sentence the sentence given
      */
-    public Music(String sentence){
+    public Music(String sentence) {
         super(sentence);
         music = new HashMap<>();
         analyzeSentence();
@@ -48,18 +49,18 @@ public class Music extends Action {
      * Analyzes the spoken sentence even more to retrieve information.
      */
     @Override
-     protected void analyzeSentence(){
+    protected void analyzeSentence() {
         String[] tokens = sentence.split(" ");
         String word;
         //let's assume (s)he'll choose a song and not something containing the artist, album, or all of them
-        for (int i = 0; i < tokens.length; ++i){
+        for (int i = 0; i < tokens.length; ++i) {
             word = tokens[i];
             switch (word) {
                 case "play":
                     this.songToPlay = this.artistToPlay = sentence.substring(i + 1);
                     break;
                 case "listen":
-                    if(tokens[i + 1].equals("to"))
+                    if (tokens[i + 1].equals("to"))
                         this.songToPlay = this.artistToPlay = sentence.substring(i + 2);
                     break;
                 case "from":
@@ -78,9 +79,9 @@ public class Music extends Action {
     /**
      * Populates the hashmap with all the songs
      */
-    private static void populateMusic(){
+    private static void populateMusic() {
         //hardcoded /sdcard seems like a bad choice, so let's use the API for safety
-       // File sdcard = Environment.getExternalStorageDirectory(); //this also looks like a bad idea
+        // File sdcard = Environment.getExternalStorageDirectory(); //this also looks like a bad idea
         //as it relies on absolute sdcard paths
 
 
@@ -111,7 +112,8 @@ public class Music extends Action {
                 music.put(cursor.getString(0), value);
                 value = new ArrayList<>();
             }
-        } catch (NullPointerException ignore) { }
+        } catch (NullPointerException ignore) {
+        }
 
     }
 
@@ -129,8 +131,9 @@ public class Music extends Action {
         }
     }
 
+    //Changed the functionality of the method you need to make changes(duh..)
     @Override
-    public Intent executeCommandIntent() {
+    public void executeCommand() {
         //not even sure about this shit
         Intent intent = new Intent();
         ComponentName comp = new ComponentName("com.android.music", "com.android.music.MediaPlaybackActivity");
@@ -138,6 +141,6 @@ public class Music extends Action {
         intent.setAction(android.content.Intent.ACTION_VIEW);
         File file = new File(songPath); //maybe use URI
         intent.setDataAndType(Uri.fromFile(file), "audio/*");
-        return intent;
+
     }
 }
