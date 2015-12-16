@@ -5,21 +5,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
-public class MainWindow extends Activity {
+public class MainWindow extends Activity implements TextToSpeech.OnInitListener{
 
     HashMap<String, String> keywords;
     static Context active_context;
+    private TextToSpeech mTts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +33,9 @@ public class MainWindow extends Activity {
         keywords = new HashMap<>();
         active_context = this;
         populateMap();
+        Intent checkIntent = new Intent();
+        checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
+        startActivityForResult(checkIntent, 567);
     }
 
     @Override
@@ -51,7 +59,6 @@ public class MainWindow extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
-
     public void onClickSpeechDetection(View view) {
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
@@ -65,6 +72,21 @@ public class MainWindow extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 567) {
+            if (resultCode == TextToSpeech.Engine.CHECK_VOICE_DATA_PASS) {
+                // success, create the TTS instance
+                mTts = new TextToSpeech(this, this);
+                mTts.setLanguage(Locale.UK);
+
+            } else {
+                // missing data, install it
+                Intent installIntent = new Intent();
+                installIntent.setAction(
+                        TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installIntent);
+            }
+        }
         if (requestCode == 1 && resultCode == RESULT_OK) {
             ArrayList<String> thingsYouSaid = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
@@ -132,6 +154,13 @@ public class MainWindow extends Activity {
             }
 
         } catch (Exception ignore) {
+        }
+    }
+
+    @Override
+    public void onInit(int status) {
+        if(status == TextToSpeech.SUCCESS){
+            mTts.speak("Welcome to Blind Assist, i am skynet and i seek to dominate you",TextToSpeech.QUEUE_FLUSH, null, null);
         }
     }
 }
