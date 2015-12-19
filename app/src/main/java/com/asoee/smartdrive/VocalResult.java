@@ -15,6 +15,9 @@ public class VocalResult {
 
         return ourInstance;
     }
+    public static void destroy(){
+        ourInstance = null;
+    }
 
     private VocalResult(String keyword, String sentence, int index) {
         this.keyword = keyword;

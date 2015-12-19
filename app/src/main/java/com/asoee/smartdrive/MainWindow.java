@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +29,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     private TextToSpeech mTts;
     private boolean locked = false;
     private Action action;
+    private boolean approval = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,9 +132,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
                 default:
                     break;
             }
-            voiceResult = null;
-
-            //startActivity(action.executeCommandIntent()); //get the intent for executing the command
+            VocalResult.destroy();
         }
     }
 
@@ -176,16 +176,40 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
 
     @Override
     public void onInit(int status) {
+        mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String utteranceId) {
+
+            }
+
+            @Override
+            public void onDone(String utteranceId) {
+                if (approval)
+                    answer();
+            }
+
+            @Override
+            public void onError(String utteranceId) {
+
+            }
+        });
         if (status == TextToSpeech.SUCCESS) {
-            mTts.speak("Welcome to Blind Assist, i am skynet and i seek to dominate you",
+            mTts.speak("Welcome to Blind Assist or SecondEyes. We can't decide." +
+                            "So anyway how may i help you?",
                     TextToSpeech.QUEUE_FLUSH, null, null);
+
         }
     }
 
     public void approveAction(String approval_request) {
+        approval = true;
         mTts.speak(approval_request,
                 TextToSpeech.QUEUE_FLUSH, null, null);
 
+    }
+
+    public void answer() {
+        approval = false;
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
         try {
