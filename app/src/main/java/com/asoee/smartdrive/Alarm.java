@@ -1,6 +1,5 @@
 package com.asoee.smartdrive;
 
-import android.app.AlarmManager;
 import android.content.Intent;
 import android.provider.AlarmClock;
 
@@ -32,7 +31,7 @@ public class Alarm extends Action {
                 time = tokens[2];
 
         if (time != null)
-            MainWindow.activity.approveAction("I will set an alarm for: " + time + " is that correct?");
+            MainWindow.activity.approveAction("I will set an alarm for: " + time + " is that correct?", true);
     }
 
     @Override

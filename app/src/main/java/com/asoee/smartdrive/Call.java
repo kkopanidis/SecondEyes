@@ -5,8 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
-import java.util.HashMap;
-
 public class Call extends Action {
 
     String number;
@@ -35,7 +33,6 @@ public class Call extends Action {
     }
 
     void getContacts(String contact) {
-        ;
         Cursor contacts = MainWindow.active_context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
         while (contacts.moveToNext()) {
@@ -44,7 +41,7 @@ public class Call extends Action {
             if (name.equalsIgnoreCase(contact)) {
                 number = "tel:" + phoneNumber;
                 MainWindow.activity.approveAction("I will call: " + name + " on: " + phoneNumber
-                        + " is that correct?");
+                        + " is that correct?", true);
                 return;
             }
         }

@@ -12,8 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -28,7 +26,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     static MainWindow activity;
     private TextToSpeech mTts;
     private boolean locked = false;
-    private Action action;
+    Action action;
     private boolean approval = false;
 
     @Override
@@ -129,6 +127,9 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
                 case "call":
                     action = new Call(voiceResult.getSentence());
                     break;
+                case "time":
+                    action = new DateTime(voiceResult.getSentence());
+                    break;
                 default:
                     break;
             }
@@ -195,17 +196,16 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         });
         if (status == TextToSpeech.SUCCESS) {
             mTts.speak("Welcome to Blind Assist or SecondEyes. We can't decide." +
-                            "So anyway how may i help you?",
+                            "So anyway how may i help you? Nigga",
                     TextToSpeech.QUEUE_FLUSH, null, null);
 
         }
     }
 
-    public void approveAction(String approval_request) {
-        approval = true;
+    public void approveAction(String approval_request, boolean approval) {
+        this.approval = approval;
         mTts.speak(approval_request,
                 TextToSpeech.QUEUE_FLUSH, null, null);
-
     }
 
     public void answer() {

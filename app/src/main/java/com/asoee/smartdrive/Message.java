@@ -1,6 +1,5 @@
 package com.asoee.smartdrive;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
@@ -10,7 +9,7 @@ import java.util.HashMap;
 public class Message extends Action {
 
     private String message;
-    private String contact_name;
+    private String contactName;
     private HashMap<String, String> contacts;
 
     /**
@@ -25,8 +24,8 @@ public class Message extends Action {
 
             return;
         }
-        MainWindow.activity.approveAction("I will text: " + contact_name + " " + message
-                + "  is that correct?");
+        MainWindow.activity.approveAction("I will text: " + contactName + " " + message
+                + "  is that correct?", true);
     }
 
     @Override
@@ -48,10 +47,10 @@ public class Message extends Action {
             case "message":
                 if (second.equals("to") && contacts.containsKey(third)) {
                     message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
-                    contact_name = third;
+                    contactName = third;
                 } else if (contacts.containsKey(second)) {
                     message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
-                    contact_name = second;
+                    contactName = second;
                 } else if (contacts.containsKey(last)) {
                     sentence = sentence.substring("message".length(), sentence.indexOf(last)).trim();
                     if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
@@ -59,7 +58,7 @@ public class Message extends Action {
                     }
 
                     message = sentence;
-                    contact_name = last;
+                    contactName = last;
                 } else {
                     //incorrect
                     message = null;
@@ -68,17 +67,17 @@ public class Message extends Action {
             case "send":
                 if (second.equals("to") && contacts.containsKey(third)) {
                     message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
-                    contact_name = third;
+                    contactName = third;
                 } else if (contacts.containsKey(second)) {
                     message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
-                    contact_name = second;
+                    contactName = second;
                 } else if (contacts.containsKey(last)) {
                     sentence = sentence.substring("send".length(), sentence.indexOf(last)).trim();
                     if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
                         sentence = sentence.substring(0, sentence.lastIndexOf(' ')).trim();
                     }
                     message = sentence;
-                    contact_name = last;
+                    contactName = last;
                 } else {
                     //incorrect
                     message = null;
@@ -87,10 +86,10 @@ public class Message extends Action {
             case "text":
                 if (second.equals("to") && contacts.containsKey(third)) {
                     message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
-                    contact_name = third;
+                    contactName = third;
                 } else if (contacts.containsKey(second)) {
                     message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
-                    contact_name = second;
+                    contactName = second;
                 } else if (contacts.containsKey(last)) {
                     sentence = sentence.substring("text".length(), sentence.indexOf(last)).trim();
                     if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
@@ -98,7 +97,7 @@ public class Message extends Action {
                     }
 
                     message = sentence;
-                    contact_name = last;
+                    contactName = last;
                 } else {
                     //incorrect
                     message = null;
@@ -111,7 +110,7 @@ public class Message extends Action {
 
     @Override
     public void executeCommand() {
-        SmsManager.getDefault().sendTextMessage(contacts.get(contact_name),
+        SmsManager.getDefault().sendTextMessage(contacts.get(contactName),
                 null, message, null, null);
     }
 
