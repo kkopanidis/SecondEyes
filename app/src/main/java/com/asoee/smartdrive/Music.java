@@ -2,6 +2,8 @@ package com.asoee.smartdrive;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.provider.MediaStore;
 
 import java.util.ArrayList;
@@ -147,14 +149,8 @@ public class Music extends Action {
 
         if (songPath == null)
             return;
-        //not even sure about this shit
-        Intent intent = new Intent("android.intent.category.APP_MUSIC");
-        /*ComponentName comp = new ComponentName("com.android.music", "com.android.music.MediaPlaybackActivity");
-        intent.setComponent(comp);
-        intent.setAction(android.content.Intent.ACTION_VIEW);*/
-       // File file = new File(songPath); //maybe use URI
-        //intent.setDataAndType(Uri.fromFile(file), "audio/*");
-        MainWindow.activity.startActivity(intent);
+        MediaPlayer player = MediaPlayer.create(MainWindow.active_context, Uri.parse(songPath));
+        player.start();
 
     }
 }
