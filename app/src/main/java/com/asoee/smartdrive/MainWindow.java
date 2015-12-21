@@ -22,7 +22,7 @@ import java.util.Locale;
 public class MainWindow extends Activity implements TextToSpeech.OnInitListener {
 
     HashMap<String, String> keywords;
-    static Context active_context;
+    static Context activeContext;
     static MainWindow activity;
     private TextToSpeech mTts;
     private boolean locked = false;
@@ -35,7 +35,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         setContentView(R.layout.activity_main_window);
         keywords = new HashMap<>();
         activity = this;
-        active_context = this;
+        activeContext = this;
         populateMap();
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);

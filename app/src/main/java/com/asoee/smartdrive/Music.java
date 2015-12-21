@@ -1,6 +1,5 @@
 package com.asoee.smartdrive;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -52,7 +51,7 @@ public class Music extends Action {
         //not sure if possible
         //maybe have a Context musicQ as argument, don't know how to use it
 
-        Cursor cursor = MainWindow.active_context.getContentResolver().query(
+        Cursor cursor = MainWindow.activeContext.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 COLS,
                 MUSIC_ONLY,
@@ -149,7 +148,7 @@ public class Music extends Action {
 
         if (songPath == null)
             return;
-        MediaPlayer player = MediaPlayer.create(MainWindow.active_context, Uri.parse(songPath));
+        MediaPlayer player = MediaPlayer.create(MainWindow.activeContext, Uri.parse(songPath));
         player.start();
 
     }

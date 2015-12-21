@@ -43,7 +43,7 @@ public class Alarm extends Action {
         alarm.putExtra(AlarmClock.EXTRA_HOUR, Integer.parseInt(hour));
         alarm.putExtra(AlarmClock.EXTRA_MINUTES, Integer.parseInt(minutes));
         alarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-        MainWindow.active_context.startActivity(alarm);
+        MainWindow.activeContext.startActivity(alarm);
         time = null;
     }
 
