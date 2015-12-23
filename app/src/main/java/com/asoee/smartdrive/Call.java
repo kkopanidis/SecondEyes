@@ -29,11 +29,11 @@ public class Call extends Action {
     @Override
     public void executeCommand() {
         Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(number));
-        MainWindow.active_context.startActivity(callIntent);
+        MainWindow.activeContext.startActivity(callIntent);
     }
 
     void getContacts(String contact) {
-        Cursor contacts = MainWindow.active_context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+        Cursor contacts = MainWindow.activeContext.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
         while (contacts.moveToNext()) {
             String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
