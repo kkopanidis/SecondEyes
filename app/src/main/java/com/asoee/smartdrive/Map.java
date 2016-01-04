@@ -103,7 +103,7 @@ public class Map extends Action {
                 case 'ρ': latinStr += "r"; break;
                 case 'σ': latinStr += "s"; break;
                 case 'τ': latinStr += "t"; break;
-                case 'υ': latinStr += "y"; break;
+                case 'υ': latinStr += "u"; break;
                 case 'φ': latinStr += "f"; break;
                 case 'χ': latinStr += "ch"; break;
                 case 'ψ': latinStr += "ps"; break;
