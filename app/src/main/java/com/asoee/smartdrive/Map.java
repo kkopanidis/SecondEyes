@@ -85,6 +85,7 @@ public class Map extends Action {
             }
             switch(c){
                 case ' ': latinStr += " "; break;
+                case 'α': latinStr += "a"; break;
                 case 'β': latinStr += "v"; break;
                 case 'γ': latinStr += "g"; break;
                 case 'δ': latinStr += "d"; break;
