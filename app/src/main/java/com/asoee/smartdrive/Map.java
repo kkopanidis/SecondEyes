@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class Map extends Action {
 
@@ -59,15 +60,56 @@ public class Map extends Action {
     public void executeCommand() {
         if(currentLocation == null) return;
 
-        Geocoder geocoder = new Geocoder(MainWindow.activeContext, MainWindow.activity.getResources().getConfiguration().locale);
+        Geocoder geocoder = new Geocoder(MainWindow.activeContext, new Locale("en"));
         try {
             List<Address> addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
             if (addresses != null && addresses.size() > 0) {
                 MainWindow.activity
-                        .approveAction("You're on "+addresses.get(0).getThoroughfare()+", "+addresses.get(0).getSubAdminArea() ,false);
+                        .approveAction("You're on "+convertToLatin(addresses.get(0).getSubThoroughfare()) ,false);
             }
         } catch (IOException ioe){
             //MainWindow.activity.approveAction("Sorry, couldn't find your location. Try again." ,false);
         }
+    }
+
+    private String convertToLatin(String str){
+        if(str == null || str.trim() == "") return null;
+
+        char[] strc = str.toLowerCase().toCharArray();
+        String latinStr = "";
+
+        for(char c : strc){
+            if(Character.isDigit(c)){
+                latinStr += c;
+                continue;
+            }
+            switch(c){
+                case ' ': latinStr += " "; break;
+                case 'β': latinStr += "v"; break;
+                case 'γ': latinStr += "g"; break;
+                case 'δ': latinStr += "d"; break;
+                case 'ε': latinStr += "e"; break;
+                case 'ζ': latinStr += "z"; break;
+                case 'η': latinStr += "ee"; break;
+                case 'θ': latinStr += "th"; break;
+                case 'ι': latinStr += "ee"; break;
+                case 'κ': latinStr += "k"; break;
+                case 'λ': latinStr += "l"; break;
+                case 'μ': latinStr += "m"; break;
+                case 'ν': latinStr += "n"; break;
+                case 'ξ': latinStr += "x"; break;
+                case 'ο': latinStr += "o"; break;
+                case 'π': latinStr += "p"; break;
+                case 'ρ': latinStr += "r"; break;
+                case 'σ': latinStr += "s"; break;
+                case 'τ': latinStr += "t"; break;
+                case 'υ': latinStr += "y"; break;
+                case 'φ': latinStr += "f"; break;
+                case 'χ': latinStr += "ch"; break;
+                case 'ψ': latinStr += "ps"; break;
+                case 'ω': latinStr += "o"; break;
+            }
+        }
+        return latinStr;
     }
 }

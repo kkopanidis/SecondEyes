@@ -195,8 +195,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
             }
         });
         if (status == TextToSpeech.SUCCESS) {
-            mTts.speak("Welcome to Blind Assist or SecondEyes. We can't decide." +
-                            "So anyway how may i help you? Nigga",
+            mTts.speak("Welcome, how may i help you",
                     TextToSpeech.QUEUE_FLUSH, null, null);
 
         }
