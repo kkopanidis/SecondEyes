@@ -65,7 +65,7 @@ public class Map extends Action {
             List<Address> addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
             if (addresses != null && addresses.size() > 0) {
                 MainWindow.activity
-                        .approveAction("You're on "+convertToLatin(addresses.get(0).getSubThoroughfare()) ,false);
+                        .approveAction("You're on "+convertToLatin(addresses.get(0).getAddressLine(0)) ,false);
             }
         } catch (IOException ioe){
             //MainWindow.activity.approveAction("Sorry, couldn't find your location. Try again." ,false);
@@ -73,7 +73,7 @@ public class Map extends Action {
     }
 
     private String convertToLatin(String str){
-        if(str == null || str.trim() == "") return null;
+        if(str == null || str.trim().equals("")) return null;
 
         char[] strc = str.toLowerCase().toCharArray();
         String latinStr = "";
@@ -103,6 +103,7 @@ public class Map extends Action {
                 case 'π': latinStr += "p"; break;
                 case 'ρ': latinStr += "r"; break;
                 case 'σ': latinStr += "s"; break;
+                case 'ς': latinStr += "s"; break;
                 case 'τ': latinStr += "t"; break;
                 case 'υ': latinStr += "u"; break;
                 case 'φ': latinStr += "f"; break;

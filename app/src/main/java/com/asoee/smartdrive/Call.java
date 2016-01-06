@@ -33,6 +33,12 @@ public class Call extends Action {
     }
 
     void getContacts(String contact) {
+        if(!contact.matches("[a-zA-z]+")){
+            number = "tel:" + contact;
+            MainWindow.activity.approveAction("I will call: " + contact
+                    + " is that correct?", true);
+            return;
+        }
         Cursor contacts = MainWindow.activeContext.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
         while (contacts.moveToNext()) {
@@ -46,6 +52,5 @@ public class Call extends Action {
             }
         }
         contacts.close();
-
     }
 }

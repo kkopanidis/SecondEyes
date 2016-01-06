@@ -27,7 +27,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     private TextToSpeech mTts;
     private boolean locked = false;
     Action action;
-    private boolean approval = false;
+    public static boolean approval = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +100,10 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
                     if (answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("ok")) {
                         action.executeCommand();
                         action = null;
+                        approveAction("Done", false);
                         return;
                     } else {
+                        approveAction("cancelled", false);
                         action = null;
                         return;
                     }
@@ -129,6 +131,9 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
                     break;
                 case "time":
                     action = new DateTime(voiceResult.getSentence());
+                    break;
+                case "contact":
+                    action = new Contact(voiceResult.getSentence());
                     break;
                 default:
                     break;
@@ -177,23 +182,6 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
 
     @Override
     public void onInit(int status) {
-        mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-            @Override
-            public void onStart(String utteranceId) {
-
-            }
-
-            @Override
-            public void onDone(String utteranceId) {
-                if (approval)
-                    answer();
-            }
-
-            @Override
-            public void onError(String utteranceId) {
-
-            }
-        });
         if (status == TextToSpeech.SUCCESS) {
             mTts.speak("Welcome, how may i help you",
                     TextToSpeech.QUEUE_FLUSH, null, null);
@@ -202,9 +190,13 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     }
 
     public void approveAction(String approval_request, boolean approval) {
-        this.approval = approval;
+        MainWindow.approval = approval;
         mTts.speak(approval_request,
                 TextToSpeech.QUEUE_FLUSH, null, null);
+        if (approval) {
+            while (mTts.isSpeaking()) ; //jesus fuck..
+            answer();
+        }
     }
 
     public void answer() {
@@ -214,7 +206,8 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         try {
             startActivityForResult(i, 1);
         } catch (Exception e) {
-            Toast.makeText(this, "Error initializing speech to text engine.", Toast.LENGTH_LONG).show();
+            Toast.makeText( this, "Error initializing speech to text engine.", Toast.LENGTH_LONG).show();
         }
     }
+
 }
