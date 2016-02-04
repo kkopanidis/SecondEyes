@@ -1,5 +1,6 @@
 package com.asoee.smartdrive;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
@@ -17,22 +18,21 @@ public class Message extends Action {
      *
      * @param sentence the sentence given
      */
-    public Message(String sentence) {
-        super(sentence);
+    public Message(String sentence, Activity callback) {
+        super(sentence, callback);
         //Do something
         if (message == null) {
-
             return;
         }
-        MainWindow.activity.approveAction("I will text: " + contactName + " " + message
+        ((MainWindow) callback).approveAction("I will text: " + contactName + " " + message
                 + "  is that correct?", true);
     }
 
     @Override
     protected void analyzeSentence() {
         getContacts();
-        sentence = sentence.toLowerCase().trim();
-        String[] tokens = sentence.split("\\s");
+        String sentence_proc = sentence.toLowerCase().trim();
+        String[] tokens = sentence_proc.split("\\s");
         int token;
         String first = tokens[0].trim();
         String second = " ";
@@ -46,18 +46,18 @@ public class Message extends Action {
         switch (first) {
             case "message":
                 if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
+                    message = sentence_proc.substring(sentence_proc.indexOf(third) + third.length(), sentence_proc.length());
                     contactName = third;
                 } else if (contacts.containsKey(second)) {
-                    message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
+                    message = sentence_proc.substring(sentence_proc.indexOf(second) + second.length(), sentence_proc.length());
                     contactName = second;
                 } else if (contacts.containsKey(last)) {
-                    sentence = sentence.substring("message".length(), sentence.indexOf(last)).trim();
-                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
-                        sentence = sentence.substring(0, sentence.lastIndexOf(' ')).trim();
+                    sentence_proc = sentence_proc.substring("message".length(), sentence_proc.indexOf(last)).trim();
+                    if (sentence_proc.substring(sentence_proc.lastIndexOf(' '), sentence_proc.length()).contains("to")) {
+                        sentence_proc = sentence_proc.substring(0, sentence_proc.lastIndexOf(' ')).trim();
                     }
 
-                    message = sentence;
+                    message = sentence_proc;
                     contactName = last;
                 } else {
                     //incorrect
@@ -66,17 +66,17 @@ public class Message extends Action {
                 break;
             case "send":
                 if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
+                    message = sentence_proc.substring(sentence_proc.indexOf(third) + third.length(), sentence_proc.length());
                     contactName = third;
                 } else if (contacts.containsKey(second)) {
-                    message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
+                    message = sentence_proc.substring(sentence_proc.indexOf(second) + second.length(), sentence_proc.length());
                     contactName = second;
                 } else if (contacts.containsKey(last)) {
-                    sentence = sentence.substring("send".length(), sentence.indexOf(last)).trim();
-                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
-                        sentence = sentence.substring(0, sentence.lastIndexOf(' ')).trim();
+                    sentence_proc = sentence_proc.substring("send".length(), sentence_proc.indexOf(last)).trim();
+                    if (sentence_proc.substring(sentence_proc.lastIndexOf(' '), sentence_proc.length()).contains("to")) {
+                        sentence_proc = sentence_proc.substring(0, sentence_proc.lastIndexOf(' ')).trim();
                     }
-                    message = sentence;
+                    message = sentence_proc;
                     contactName = last;
                 } else {
                     //incorrect
@@ -85,18 +85,18 @@ public class Message extends Action {
                 break;
             case "text":
                 if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
+                    message = sentence_proc.substring(sentence_proc.indexOf(third) + third.length(), sentence_proc.length());
                     contactName = third;
                 } else if (contacts.containsKey(second)) {
-                    message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
+                    message = sentence_proc.substring(sentence_proc.indexOf(second) + second.length(), sentence_proc.length());
                     contactName = second;
                 } else if (contacts.containsKey(last)) {
-                    sentence = sentence.substring("text".length(), sentence.indexOf(last)).trim();
-                    if (sentence.substring(sentence.lastIndexOf(' '), sentence.length()).contains("to")) {
-                        sentence = sentence.substring(0, sentence.lastIndexOf(' ')).trim();
+                    sentence_proc = sentence_proc.substring("text".length(), sentence_proc.indexOf(last)).trim();
+                    if (sentence_proc.substring(sentence_proc.lastIndexOf(' '), sentence_proc.length()).contains("to")) {
+                        sentence_proc = sentence_proc.substring(0, sentence_proc.lastIndexOf(' ')).trim();
                     }
 
-                    message = sentence;
+                    message = sentence_proc;
                     contactName = last;
                 } else {
                     //incorrect
@@ -116,7 +116,7 @@ public class Message extends Action {
 
     void getContacts() {
         contacts = new HashMap<>();
-        Cursor contacts = MainWindow.activeContext.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+        Cursor contacts = callback.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
         while (contacts.moveToNext()) {
             String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
             String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));

@@ -1,5 +1,6 @@
 package com.asoee.smartdrive;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.provider.AlarmClock;
 
@@ -11,14 +12,14 @@ public class Alarm extends Action {
      *
      * @param sentence the sentence given
      */
-    public Alarm(String sentence) {
-        super(sentence);
+    public Alarm(String sentence, Activity callback) {
+        super(sentence, callback);
     }
 
     @Override
     protected void analyzeSentence() {
-        sentence = sentence.toLowerCase();
-        String[] tokens = sentence.split("\\s");
+        String sentence_proc = sentence.toLowerCase();
+        String[] tokens = sentence_proc.split("\\s");
         if (tokens[0].equals("alarm"))
             if (tokens[1].equals("for"))
                 time = tokens[2];
@@ -31,7 +32,7 @@ public class Alarm extends Action {
                 time = tokens[2];
 
         if (time != null)
-            MainWindow.activity.approveAction("I will set an alarm for: " + time + " is that correct?", true);
+            ((MainWindow) callback).approveAction("I will set an alarm for: " + time + " is that correct?", true);
     }
 
     @Override
@@ -43,7 +44,7 @@ public class Alarm extends Action {
         alarm.putExtra(AlarmClock.EXTRA_HOUR, Integer.parseInt(hour));
         alarm.putExtra(AlarmClock.EXTRA_MINUTES, Integer.parseInt(minutes));
         alarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
-        MainWindow.activeContext.startActivity(alarm);
+        callback.startActivity(alarm);
         time = null;
     }
 

@@ -1,19 +1,22 @@
 package com.asoee.smartdrive;
 
 
+import android.app.Activity;
 import android.content.Intent;
 
 public abstract class Action {
 
-    String sentence;
+    final String sentence;
+    final Activity callback;
 
     /**
      * Does constructor stuff
      *
      * @param sentence the sentence given
      */
-    public Action(String sentence) {
+    public Action(String sentence, Activity callback) {
         this.sentence = sentence;
+        this.callback = callback;
         analyzeSentence();
     }
 

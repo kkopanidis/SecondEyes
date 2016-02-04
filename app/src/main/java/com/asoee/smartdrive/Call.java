@@ -1,5 +1,6 @@
 package com.asoee.smartdrive;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,14 +15,14 @@ public class Call extends Action {
      *
      * @param sentence the sentence given
      */
-    public Call(String sentence) {
-        super(sentence);
+    public Call(String sentence, Activity callback) {
+        super(sentence, callback);
     }
 
     @Override
     protected void analyzeSentence() {
-        sentence = sentence.toLowerCase();
-        String[] tokens = sentence.split("\\s");
+        String sentence_proc = sentence.toLowerCase();
+        String[] tokens = sentence_proc.split("\\s");
         if (tokens[0].equals("call"))
             getContacts(tokens[1]);
     }
@@ -29,24 +30,24 @@ public class Call extends Action {
     @Override
     public void executeCommand() {
         Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(number));
-        MainWindow.activeContext.startActivity(callIntent);
+        callback.startActivity(callIntent);
     }
 
     void getContacts(String contact) {
-        if(!contact.matches("[a-zA-z]+")){
+        if (!contact.matches("[a-zA-z]+")) {
             number = "tel:" + contact;
-            MainWindow.activity.approveAction("I will call: " + contact
+            ((MainWindow)callback).approveAction("I will call: " + contact
                     + " is that correct?", true);
             return;
         }
-        Cursor contacts = MainWindow.activeContext.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+        Cursor contacts = ((MainWindow)callback).getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
         while (contacts.moveToNext()) {
             String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
             String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             if (name.equalsIgnoreCase(contact)) {
                 number = "tel:" + phoneNumber;
-                MainWindow.activity.approveAction("I will call: " + name + " on: " + phoneNumber
+                ((MainWindow)callback).approveAction("I will call: " + name + " on: " + phoneNumber
                         + " is that correct?", true);
                 return;
             }

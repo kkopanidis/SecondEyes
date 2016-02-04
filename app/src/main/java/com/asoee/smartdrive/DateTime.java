@@ -1,5 +1,6 @@
 package com.asoee.smartdrive;
 
+import android.app.Activity;
 import android.text.format.Time;
 
 import java.util.Calendar;
@@ -10,19 +11,19 @@ public class DateTime extends Action {
     boolean isTime;
     boolean isDate;
 
-    public DateTime(String sentence) {
-        super(sentence);
+    public DateTime(String sentence, Activity callback) {
+        super(sentence, callback);
     }
 
     @Override
     protected void analyzeSentence() {
-        sentence = sentence.toLowerCase();
-        if (sentence.contains("time"))
+        String sentence_proc = sentence.toLowerCase();
+        if (sentence_proc.contains("time"))
             isTime = true;
-        if (sentence.contains("date"))
+        if (sentence_proc.contains("date"))
             isDate = true;
         executeCommand();
-        MainWindow.activity.action = null;
+        ((MainWindow)callback).action = null;
     }
 
     @Override
@@ -33,21 +34,20 @@ public class DateTime extends Action {
 
         String tell;
         if (isTime && isDate) {
-            tell = "Today is "+c.getDisplayName(Calendar.DAY_OF_WEEK,
-                    Calendar.LONG, Locale.getDefault())+" "+c.get(Calendar.DAY_OF_MONTH)
-                    +" "+c.get(Calendar.DAY_OF_MONTH) +" "+ c.get(Calendar.MONTH)
-                    +" "+c.get(Calendar.YEAR)+" and the time is " + now.hour+":"+now.minute;
+            tell = "Today is " + c.getDisplayName(Calendar.DAY_OF_WEEK,
+                    Calendar.LONG, Locale.getDefault()) + " " + c.get(Calendar.DAY_OF_MONTH)
+                    + " " + c.get(Calendar.DAY_OF_MONTH) + " " + c.get(Calendar.MONTH)
+                    + " " + c.get(Calendar.YEAR) + " and the time is " + now.hour + ":" + now.minute;
         } else if (isDate) {
-            tell = "Today is "+c.getDisplayName(Calendar.DAY_OF_WEEK,
-                    Calendar.LONG, Locale.getDefault())+" "+c.get(Calendar.DAY_OF_MONTH)
-                    +"/"+ c.get(Calendar.MONTH) +"/"+c.get(Calendar.YEAR);
+            tell = "Today is " + c.getDisplayName(Calendar.DAY_OF_WEEK,
+                    Calendar.LONG, Locale.getDefault()) + " " + c.get(Calendar.DAY_OF_MONTH)
+                    + "/" + c.get(Calendar.MONTH) + "/" + c.get(Calendar.YEAR);
         } else if (isTime) {
             tell = "It's " + now.hour + ":" + now.minute;
-        }
-        else
+        } else
             return;
 
-        MainWindow.activity.approveAction(tell , false);
+        ((MainWindow)callback).approveAction(tell, false);
 
     }
 }

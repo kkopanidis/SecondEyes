@@ -1,5 +1,6 @@
 package com.asoee.smartdrive;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -30,8 +31,8 @@ public class Music extends Action {
      *
      * @param sentence the sentence given
      */
-    public Music(String sentence) {
-        super(sentence);
+    public Music(String sentence, Activity callback) {
+        super(sentence, callback);
         music = new HashMap<>();
         analyzeSentence();
         populateMusic();
@@ -42,7 +43,7 @@ public class Music extends Action {
     /**
      * Populates the hashmap with all the songs
      */
-    private static void populateMusic() {
+    private void populateMusic() {
         //hardcoded /sdcard seems like a bad choice, so let's use the API for safety
         // File sdcard = Environment.getExternalStorageDirectory(); //this also looks like a bad idea
         //as it relies on absolute sdcard paths
@@ -51,7 +52,7 @@ public class Music extends Action {
         //not sure if possible
         //maybe have a Context musicQ as argument, don't know how to use it
 
-        Cursor cursor = MainWindow.activeContext.getContentResolver().query(
+        Cursor cursor = callback.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 COLS,
                 MUSIC_ONLY,
@@ -81,6 +82,7 @@ public class Music extends Action {
                 }
 
             }
+            cursor.close();
         } catch (NullPointerException ignore) {
         }
 
@@ -148,7 +150,7 @@ public class Music extends Action {
 
         if (songPath == null)
             return;
-        MediaPlayer player = MediaPlayer.create(MainWindow.activeContext, Uri.parse(songPath));
+        MediaPlayer player = MediaPlayer.create(callback, Uri.parse(songPath));
         player.start();
 
     }

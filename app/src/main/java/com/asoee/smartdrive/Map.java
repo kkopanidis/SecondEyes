@@ -1,5 +1,6 @@
 package com.asoee.smartdrive;
 
+import android.app.Activity;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
@@ -22,8 +23,8 @@ public class Map extends Action {
      *
      * @param sentence the sentence given
      */
-    public Map(String sentence) {
-        super(sentence);
+    public Map(String sentence, Activity callback) {
+        super(sentence, callback);
         lolcation();
     }
 
@@ -32,9 +33,9 @@ public class Map extends Action {
 
     }
 
-    protected void lolcation(){
+    protected void lolcation() {
         // Acquire a reference to the system Location Manager
-        locationManager = (LocationManager) MainWindow.activeContext.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) callback.getSystemService(Context.LOCATION_SERVICE);
 
         // Define a listener that responds to location updates
         LocationListener locationListener = new LocationListener() {
@@ -45,11 +46,14 @@ public class Map extends Action {
                 executeCommand();
             }
 
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
 
-            public void onProviderEnabled(String provider) {}
+            public void onProviderEnabled(String provider) {
+            }
 
-            public void onProviderDisabled(String provider) {}
+            public void onProviderDisabled(String provider) {
+            }
         };
 
         // Register the listener with the Location Manager to receive location updates
@@ -58,58 +62,110 @@ public class Map extends Action {
 
     @Override
     public void executeCommand() {
-        if(currentLocation == null) return;
+        if (currentLocation == null) return;
 
-        Geocoder geocoder = new Geocoder(MainWindow.activeContext, new Locale("en"));
+        Geocoder geocoder = new Geocoder(callback, new Locale("en"));
         try {
             List<Address> addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
             if (addresses != null && addresses.size() > 0) {
-                MainWindow.activity
-                        .approveAction("You're on "+convertToLatin(addresses.get(0).getAddressLine(0)) ,false);
+                ((MainWindow)callback)
+                        .approveAction("You're on " + convertToLatin(addresses.get(0).getAddressLine(0)), false);
             }
-        } catch (IOException ioe){
+        } catch (IOException ioe) {
             //MainWindow.activity.approveAction("Sorry, couldn't find your location. Try again." ,false);
         }
     }
 
-    private String convertToLatin(String str){
-        if(str == null || str.trim().equals("")) return null;
+    private String convertToLatin(String str) {
+        if (str == null || str.trim().equals("")) return null;
 
         char[] strc = str.toLowerCase().toCharArray();
         String latinStr = "";
 
-        for(char c : strc){
-            if(Character.isDigit(c)){
+        for (char c : strc) {
+            if (Character.isDigit(c)) {
                 latinStr += c;
                 continue;
             }
-            switch(c){
-                case ' ': latinStr += " "; break;
-                case 'α': latinStr += "a"; break;
-                case 'β': latinStr += "v"; break;
-                case 'γ': latinStr += "g"; break;
-                case 'δ': latinStr += "d"; break;
-                case 'ε': latinStr += "e"; break;
-                case 'ζ': latinStr += "z"; break;
-                case 'η': latinStr += "ee"; break;
-                case 'θ': latinStr += "th"; break;
-                case 'ι': latinStr += "ee"; break;
-                case 'κ': latinStr += "k"; break;
-                case 'λ': latinStr += "l"; break;
-                case 'μ': latinStr += "m"; break;
-                case 'ν': latinStr += "n"; break;
-                case 'ξ': latinStr += "x"; break;
-                case 'ο': latinStr += "o"; break;
-                case 'π': latinStr += "p"; break;
-                case 'ρ': latinStr += "r"; break;
-                case 'σ': latinStr += "s"; break;
-                case 'ς': latinStr += "s"; break;
-                case 'τ': latinStr += "t"; break;
-                case 'υ': latinStr += "u"; break;
-                case 'φ': latinStr += "f"; break;
-                case 'χ': latinStr += "ch"; break;
-                case 'ψ': latinStr += "ps"; break;
-                case 'ω': latinStr += "o"; break;
+            switch (c) {
+                case ' ':
+                    latinStr += " ";
+                    break;
+                case 'α':
+                    latinStr += "a";
+                    break;
+                case 'β':
+                    latinStr += "v";
+                    break;
+                case 'γ':
+                    latinStr += "g";
+                    break;
+                case 'δ':
+                    latinStr += "d";
+                    break;
+                case 'ε':
+                    latinStr += "e";
+                    break;
+                case 'ζ':
+                    latinStr += "z";
+                    break;
+                case 'η':
+                    latinStr += "ee";
+                    break;
+                case 'θ':
+                    latinStr += "th";
+                    break;
+                case 'ι':
+                    latinStr += "ee";
+                    break;
+                case 'κ':
+                    latinStr += "k";
+                    break;
+                case 'λ':
+                    latinStr += "l";
+                    break;
+                case 'μ':
+                    latinStr += "m";
+                    break;
+                case 'ν':
+                    latinStr += "n";
+                    break;
+                case 'ξ':
+                    latinStr += "x";
+                    break;
+                case 'ο':
+                    latinStr += "o";
+                    break;
+                case 'π':
+                    latinStr += "p";
+                    break;
+                case 'ρ':
+                    latinStr += "r";
+                    break;
+                case 'σ':
+                    latinStr += "s";
+                    break;
+                case 'ς':
+                    latinStr += "s";
+                    break;
+                case 'τ':
+                    latinStr += "t";
+                    break;
+                case 'υ':
+                    latinStr += "u";
+                    break;
+                case 'φ':
+                    latinStr += "f";
+                    break;
+                case 'χ':
+                    latinStr += "ch";
+                    break;
+                case 'ψ':
+                    latinStr += "ps";
+                    break;
+                case 'ω':
+                    latinStr += "o";
+                    break;
             }
         }
         return latinStr;

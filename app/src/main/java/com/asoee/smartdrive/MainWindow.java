@@ -22,8 +22,6 @@ import java.util.Locale;
 public class MainWindow extends Activity implements TextToSpeech.OnInitListener {
 
     HashMap<String, String> keywords;
-    static Context activeContext;
-    static MainWindow activity;
     private TextToSpeech mTts;
     private boolean locked = false;
     Action action;
@@ -34,8 +32,6 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_window);
         keywords = new HashMap<>();
-        activity = this;
-        activeContext = this;
         populateMap();
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
@@ -115,25 +111,25 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
             //Currently not convenient, will be refined
             switch (voiceResult.getKeyword()) {
                 case "message":
-                    action = new Message(voiceResult.getSentence());
+                    action = new Message(voiceResult.getSentence(),this);
                     break;
                 case "music":
-                    action = new Music(voiceResult.getSentence());
+                    action = new Music(voiceResult.getSentence(),this);
                     break;
                 case "map":
-                    action = new Map(voiceResult.getSentence());
+                    action = new Map(voiceResult.getSentence(),this);
                     break;
                 case "alarm":
-                    action = new Alarm(voiceResult.getSentence());
+                    action = new Alarm(voiceResult.getSentence(),this);
                     break;
                 case "call":
-                    action = new Call(voiceResult.getSentence());
+                    action = new Call(voiceResult.getSentence(),this);
                     break;
                 case "time":
-                    action = new DateTime(voiceResult.getSentence());
+                    action = new DateTime(voiceResult.getSentence(),this);
                     break;
                 case "contact":
-                    action = new Contact(voiceResult.getSentence());
+                    action = new Contact(voiceResult.getSentence(),this);
                     break;
                 default:
                     break;
