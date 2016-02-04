@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class Message extends Action {
 
     private String message;
-    private String contactName;
+    private String contactName = "";
     private HashMap<String, String> contacts;
 
     /**
@@ -20,97 +20,68 @@ public class Message extends Action {
      */
     public Message(String sentence, Activity callback) {
         super(sentence, callback);
-        //Do something
-        if (message == null) {
-            return;
-        }
-        ((MainWindow) callback).approveAction("I will text: " + contactName + " " + message
-                + "  is that correct?", true);
+        dialog("");
     }
 
     @Override
     protected void analyzeSentence() {
-        getContacts();
-        String sentence_proc = sentence.toLowerCase().trim();
-        String[] tokens = sentence_proc.split("\\s");
-        int token;
-        String first = tokens[0].trim();
-        String second = " ";
-        String third = " ";
-        String last = tokens[tokens.length - 1].trim();
-        if (tokens.length > 1)
-            second = tokens[1].trim();
-        if (tokens.length > 2)
-            third = tokens[2].trim();
-
-        switch (first) {
-            case "message":
-                if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence_proc.substring(sentence_proc.indexOf(third) + third.length(), sentence_proc.length());
-                    contactName = third;
-                } else if (contacts.containsKey(second)) {
-                    message = sentence_proc.substring(sentence_proc.indexOf(second) + second.length(), sentence_proc.length());
-                    contactName = second;
-                } else if (contacts.containsKey(last)) {
-                    sentence_proc = sentence_proc.substring("message".length(), sentence_proc.indexOf(last)).trim();
-                    if (sentence_proc.substring(sentence_proc.lastIndexOf(' '), sentence_proc.length()).contains("to")) {
-                        sentence_proc = sentence_proc.substring(0, sentence_proc.lastIndexOf(' ')).trim();
-                    }
-
-                    message = sentence_proc;
-                    contactName = last;
-                } else {
-                    //incorrect
-                    message = null;
-                }
-                break;
-            case "send":
-                if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence_proc.substring(sentence_proc.indexOf(third) + third.length(), sentence_proc.length());
-                    contactName = third;
-                } else if (contacts.containsKey(second)) {
-                    message = sentence_proc.substring(sentence_proc.indexOf(second) + second.length(), sentence_proc.length());
-                    contactName = second;
-                } else if (contacts.containsKey(last)) {
-                    sentence_proc = sentence_proc.substring("send".length(), sentence_proc.indexOf(last)).trim();
-                    if (sentence_proc.substring(sentence_proc.lastIndexOf(' '), sentence_proc.length()).contains("to")) {
-                        sentence_proc = sentence_proc.substring(0, sentence_proc.lastIndexOf(' ')).trim();
-                    }
-                    message = sentence_proc;
-                    contactName = last;
-                } else {
-                    //incorrect
-                    message = null;
-                }
-                break;
-            case "text":
-                if (second.equals("to") && contacts.containsKey(third)) {
-                    message = sentence_proc.substring(sentence_proc.indexOf(third) + third.length(), sentence_proc.length());
-                    contactName = third;
-                } else if (contacts.containsKey(second)) {
-                    message = sentence_proc.substring(sentence_proc.indexOf(second) + second.length(), sentence_proc.length());
-                    contactName = second;
-                } else if (contacts.containsKey(last)) {
-                    sentence_proc = sentence_proc.substring("text".length(), sentence_proc.indexOf(last)).trim();
-                    if (sentence_proc.substring(sentence_proc.lastIndexOf(' '), sentence_proc.length()).contains("to")) {
-                        sentence_proc = sentence_proc.substring(0, sentence_proc.lastIndexOf(' ')).trim();
-                    }
-
-                    message = sentence_proc;
-                    contactName = last;
-                } else {
-                    //incorrect
-                    message = null;
-                }
-                break;
-            default:
-                break;
-        }
     }
 
     @Override
-    protected void dialog(int step) {
+    protected boolean dialog(String answer) {
+        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
+            switch (dialog_step) {
+                case 1:
+                    this.contactName = answer;
+                    ((MainWindow) callback).approveAction("You want to send a message to:"
+                            + this.contactName + " is that correct?"
+                            , true);
+                    return false;
+                case 2:
+                    this.message = answer;
+                    ((MainWindow) callback).approveAction("You want the message to say:"
+                            + this.message + " is that correct?"
+                            , true);
+                    return false;
+            }
+        } else if (answer.equalsIgnoreCase("no")) {
+            if (dialog_step == 0 && this.contactName.equals("")) {
+                return true;
+            }
+            ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
+                    " what would you like it to be?"
+                    , true);
+            return false;
+        } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1) {
+            getContacts();
+            if (!contacts.containsKey(this.contactName)) {
+                ((MainWindow) callback).approveAction("Sorry but i could not " +
+                        "find that name in your contact list. Would you like to give another one?"
+                        , true);
+                dialog_step = 0;
+                return false;
+            }
 
+        }
+
+        dialog_step++;
+        switch (dialog_step) {
+            case 1:
+                ((MainWindow) callback).approveAction("Ok, to whom?"
+                        , true);
+                return false;
+            case 2:
+                ((MainWindow) callback).approveAction("Great! And what do you want to say?"
+                        , true);
+                return false;
+            case 3:
+                ((MainWindow) callback).approveAction("OK sending the message now!"
+                        , false);
+                executeCommand();
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
@@ -125,7 +96,7 @@ public class Message extends Action {
         while (contacts.moveToNext()) {
             String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
             String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            this.contacts.put(name, phoneNumber);
+            this.contacts.put(name.toLowerCase(), phoneNumber);
         }
 
         contacts.close();

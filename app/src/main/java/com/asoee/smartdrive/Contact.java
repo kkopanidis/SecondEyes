@@ -13,30 +13,56 @@ public class Contact extends Action {
 
     public Contact(String sentence, Activity callback) {
         super(sentence,callback);
+        dialog("");
     }
 
     @Override
     protected void analyzeSentence() {
-        int index = sentence.indexOf("contact");
-        String details = sentence.substring(index + "contact".length()).trim();
-        String[] tokens = details.split(" ");
-        name = " ";
-        number = " ";
-        for (String token : tokens) {
-            if (token.equals(""))
-                continue;
-            if (!token.matches("[0-9]+") && !token.contains("-"))
-                this.name += token;
-            else if(token.matches("[0-9]+")){
-                this.number += token;
-                break;
-            }
-            else{
-                this.number = token;
+    }
+
+    @Override
+    protected boolean dialog(String answer) {
+        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")){
+            switch(dialog_step){
+                case 1:
+                    this.name = answer;
+                    ((MainWindow)callback).approveAction("The contact name is:"
+                            + this.name+" is that correct?"
+                            , true);
+                    return false;
+                case 2:
+                    this.number = answer;
+                    ((MainWindow)callback).approveAction("The contact's number is:"
+                            + this.number+" is that correct?"
+                            , true);
+                    return false;
             }
         }
-        ((MainWindow)callback).approveAction("I will add a new contact with name " + this.name + " ,and number "
-                        + this.number + " .Is that correct?", true);
+        else if(answer.equalsIgnoreCase("no")){
+            ((MainWindow)callback).approveAction("Oh, it seems i was wrong," +
+                    " what would you like it to be?"
+                    , true);
+            return false;
+        }
+
+        dialog_step++;
+        switch (dialog_step){
+            case 1:
+                ((MainWindow)callback).approveAction("Ok, what will the name of the contact be?"
+                        , true);
+                return false;
+            case 2:
+                ((MainWindow)callback).approveAction("Great! And what will the number be?"
+                        , true);
+                return false;
+            case 3:
+                ((MainWindow)callback).approveAction("OK adding the new contact now!"
+                        , false);
+                executeCommand();
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

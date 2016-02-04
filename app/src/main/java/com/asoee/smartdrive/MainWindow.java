@@ -91,19 +91,11 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             ArrayList<String> thingsYouSaid = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             //Retrieve the user's answer to the approval
-            if (action != null)
-                for (String answer : thingsYouSaid) {
-                    if (answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("ok")) {
-                        action.executeCommand();
-                        action = null;
-                        approveAction("Done", false);
-                        return;
-                    } else {
-                        approveAction("cancelled", false);
-                        action = null;
-                        return;
-                    }
-                }
+            if (action != null) {
+                if (action.dialog(thingsYouSaid.get(0)))
+                    action = null;
+                return;
+            }
             VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
             if (voiceResult == null)
                 return;
@@ -111,25 +103,25 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
             //Currently not convenient, will be refined
             switch (voiceResult.getKeyword()) {
                 case "message":
-                    action = new Message(voiceResult.getSentence(),this);
+                    action = new Message(voiceResult.getSentence(), this);
                     break;
                 case "music":
-                    action = new Music(voiceResult.getSentence(),this);
+                    action = new Music(voiceResult.getSentence(), this);
                     break;
                 case "map":
-                    action = new Map(voiceResult.getSentence(),this);
+                    action = new Map(voiceResult.getSentence(), this);
                     break;
                 case "alarm":
-                    action = new Alarm(voiceResult.getSentence(),this);
+                    action = new Alarm(voiceResult.getSentence(), this);
                     break;
                 case "call":
-                    action = new Call(voiceResult.getSentence(),this);
+                    action = new Call(voiceResult.getSentence(), this);
                     break;
                 case "time":
-                    action = new DateTime(voiceResult.getSentence(),this);
+                    action = new DateTime(voiceResult.getSentence(), this);
                     break;
                 case "contact":
-                    action = new Contact(voiceResult.getSentence(),this);
+                    action = new Contact(voiceResult.getSentence(), this);
                     break;
                 default:
                     break;
@@ -192,6 +184,8 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         if (approval) {
             while (mTts.isSpeaking()) ; //jesus fuck..
             answer();
+        }else {
+            action = null;
         }
     }
 
@@ -202,7 +196,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         try {
             startActivityForResult(i, 1);
         } catch (Exception e) {
-            Toast.makeText( this, "Error initializing speech to text engine.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Error initializing speech to text engine.", Toast.LENGTH_LONG).show();
         }
     }
 

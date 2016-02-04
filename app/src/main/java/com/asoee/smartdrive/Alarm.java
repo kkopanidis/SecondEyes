@@ -14,30 +14,47 @@ public class Alarm extends Action {
      */
     public Alarm(String sentence, Activity callback) {
         super(sentence, callback);
+        dialog("");
     }
 
     @Override
     protected void analyzeSentence() {
-        String sentence_proc = sentence.toLowerCase();
-        String[] tokens = sentence_proc.split("\\s");
-        if (tokens[0].equals("alarm"))
-            if (tokens[1].equals("for"))
-                time = tokens[2];
-            else
-                time = tokens[1];
-        else if (tokens[0].equals("set") && tokens[1].equals("alarm"))
-            if (tokens[2].equals("for"))
-                time = tokens[3];
-            else
-                time = tokens[2];
-
-        if (time != null)
-            ((MainWindow) callback).approveAction("I will set an alarm for: " + time + " is that correct?", true);
     }
 
     @Override
-    protected void dialog(int step) {
+    protected boolean dialog(String answer) {
+        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")){
+            switch(dialog_step){
+                case 1:
+                    this.time = answer;
+                    ((MainWindow)callback).approveAction("The alarm will be set for:"
+                            + this.time+" is that correct?"
+                            , true);
+                    return false;
+            }
+        }
+        else if(answer.equalsIgnoreCase("no")){
+            ((MainWindow)callback).approveAction("Oh, it seems i was wrong," +
+                    " what would you like it to be?"
+                    , true);
+            return false;
+        }
 
+        dialog_step++;
+        switch (dialog_step){
+            case 1:
+                ((MainWindow)callback).approveAction("Waking up early are we?" +
+                        " Tell me the hour and the minute that you want the alarm"
+                        , true);
+                return false;
+            case 2:
+                ((MainWindow)callback).approveAction("Great! Adding alarm now!"
+                        , false);
+                executeCommand();
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override

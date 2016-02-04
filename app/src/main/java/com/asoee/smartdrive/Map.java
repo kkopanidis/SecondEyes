@@ -34,8 +34,8 @@ public class Map extends Action {
     }
 
     @Override
-    protected void dialog(int step) {
-
+    protected boolean dialog(String answer) {
+        return false;
     }
 
     protected void lolcation() {

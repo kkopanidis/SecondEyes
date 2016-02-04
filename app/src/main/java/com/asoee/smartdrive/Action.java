@@ -8,6 +8,7 @@ public abstract class Action {
 
     final String sentence;
     final Activity callback;
+    int dialog_step = 0;
 
     /**
      * Does constructor stuff
@@ -27,9 +28,9 @@ public abstract class Action {
 
     /**
      * Contains the dialog logic
-     * @param step indicates the part of the process
+     * @param answer is the answer of the user
      */
-    protected abstract void dialog(int step);
+    protected abstract boolean dialog(String answer);
 
     /**
      * Executes the finally retrieved command.

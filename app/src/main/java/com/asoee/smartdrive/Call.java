@@ -7,7 +7,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 
 public class Call extends Action {
-
+    String name;
     String number;
 
     /**
@@ -17,19 +17,53 @@ public class Call extends Action {
      */
     public Call(String sentence, Activity callback) {
         super(sentence, callback);
+        dialog("");
     }
 
     @Override
     protected void analyzeSentence() {
-        String sentence_proc = sentence.toLowerCase();
-        String[] tokens = sentence_proc.split("\\s");
-        if (tokens[0].equals("call"))
-            getContacts(tokens[1]);
     }
 
     @Override
-    protected void dialog(int step) {
+    protected boolean dialog(String answer) {
+        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
+            switch (dialog_step) {
+                case 1:
+                    this.name = answer;
+                    ((MainWindow) callback).approveAction("You want to call:"
+                            + this.name + " is that correct?"
+                            , true);
+                    return false;
+            }
+        } else if (answer.equalsIgnoreCase("no")) {
+            if(dialog_step == 0)
+                return true;
+            ((MainWindow) callback).approveAction("Hm i thought i got it right," +
+                    " can you repeat the name again?"
+                    , true);
+            return false;
+        }
 
+        dialog_step++;
+        switch (dialog_step) {
+            case 1:
+                ((MainWindow) callback).approveAction("Ok, who would you like to call?"
+                        , true);
+                return false;
+            case 2:
+                if(!getContacts()) {
+                    dialog_step = 0;
+                    ((MainWindow) callback).approveAction("It seems that i could not find the number," +
+                            "would you like to give me another name?"
+                            , true);
+                }
+                else {
+                    executeCommand();
+                }
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
@@ -38,25 +72,18 @@ public class Call extends Action {
         callback.startActivity(callIntent);
     }
 
-    void getContacts(String contact) {
-        if (!contact.matches("[a-zA-z]+")) {
-            number = "tel:" + contact;
-            ((MainWindow)callback).approveAction("I will call: " + contact
-                    + " is that correct?", true);
-            return;
-        }
-        Cursor contacts = ((MainWindow)callback).getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
+    boolean getContacts() {
+        Cursor contacts = ((MainWindow) callback).getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
         while (contacts.moveToNext()) {
             String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
             String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            if (name.equalsIgnoreCase(contact)) {
+            if (name.equalsIgnoreCase(this.name)) {
                 number = "tel:" + phoneNumber;
-                ((MainWindow)callback).approveAction("I will call: " + name + " on: " + phoneNumber
-                        + " is that correct?", true);
-                return;
+                return true;
             }
         }
         contacts.close();
+        return false;
     }
 }
