@@ -109,6 +109,11 @@ public class Message extends Action {
     }
 
     @Override
+    protected void dialog(int step) {
+
+    }
+
+    @Override
     public void executeCommand() {
         SmsManager.getDefault().sendTextMessage(contacts.get(contactName),
                 null, message, null, null);

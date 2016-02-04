@@ -36,6 +36,11 @@ public class Alarm extends Action {
     }
 
     @Override
+    protected void dialog(int step) {
+
+    }
+
+    @Override
     public void executeCommand() {
 
         String hour = time.split(":")[0];

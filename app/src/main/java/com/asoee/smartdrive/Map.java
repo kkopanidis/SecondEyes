@@ -33,6 +33,11 @@ public class Map extends Action {
 
     }
 
+    @Override
+    protected void dialog(int step) {
+
+    }
+
     protected void lolcation() {
         // Acquire a reference to the system Location Manager
         locationManager = (LocationManager) callback.getSystemService(Context.LOCATION_SERVICE);

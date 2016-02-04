@@ -27,6 +27,11 @@ public class DateTime extends Action {
     }
 
     @Override
+    protected void dialog(int step) {
+
+    }
+
+    @Override
     public void executeCommand() {
         Time now = new Time(Time.getCurrentTimezone());
         now.setToNow();

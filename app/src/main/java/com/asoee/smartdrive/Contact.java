@@ -8,8 +8,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class Contact extends Action {
-    String name = " ";
-    String number = " ";
+    String name;
+    String number;
 
     public Contact(String sentence, Activity callback) {
         super(sentence,callback);
@@ -42,7 +42,7 @@ public class Contact extends Action {
     @Override
     public void executeCommand() {
         this.number = this.number.replaceAll("-","");
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
 
         ops.add(ContentProviderOperation.newInsert(
                 ContactsContract.RawContacts.CONTENT_URI)

@@ -119,6 +119,11 @@ public class Music extends Action {
         }
     }
 
+    @Override
+    protected void dialog(int step) {
+
+    }
+
     /**
      * Sets the path of the song to play.
      */

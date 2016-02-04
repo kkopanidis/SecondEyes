@@ -28,6 +28,11 @@ public class Call extends Action {
     }
 
     @Override
+    protected void dialog(int step) {
+
+    }
+
+    @Override
     public void executeCommand() {
         Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse(number));
         callback.startActivity(callIntent);

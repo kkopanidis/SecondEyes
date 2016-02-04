@@ -26,6 +26,12 @@ public abstract class Action {
     protected abstract void analyzeSentence();
 
     /**
+     * Contains the dialog logic
+     * @param step indicates the part of the process
+     */
+    protected abstract void dialog(int step);
+
+    /**
      * Executes the finally retrieved command.
      */
     public abstract void executeCommand();
