@@ -10,7 +10,7 @@ import java.util.HashMap;
 public class Message extends Action {
 
     private String message;
-    private String contactName = "";
+    private String contactName;
     private HashMap<String, String> contacts;
 
     /**
@@ -25,6 +25,142 @@ public class Message extends Action {
 
     @Override
     protected void analyzeSentence() {
+        getContacts();
+        String sentence = this.sentence.toLowerCase().trim();
+        String[] tokens = sentence.split("\\s");
+        int token;
+        String first = tokens[0].trim();
+        String second = " ";
+        String third = " ";
+        message = "";
+        String last = tokens[tokens.length - 1].trim();
+        if (tokens.length > 1)
+            second = tokens[1].trim();
+        if (tokens.length > 2)
+            third = tokens[2].trim();
+
+        switch (first) {
+            case "message":
+                if (second.equals("to") && contacts.containsKey(third)) {
+                    contactName = third;
+                    if (tokens.length > 3) {
+                        message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+
+                } else if (contacts.containsKey(second)) {
+                    contactName = second;
+                    if (tokens.length > 3) {
+                        message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+                } else if (contacts.containsKey(last)) {
+                    contactName = last;
+
+                    if (tokens.length > 3) {
+                        message = sentence.substring("message".length(), sentence.indexOf(last)).trim();
+                        if (message.substring(message.lastIndexOf(' '), message.length()).contains("to")) {
+                            message = message.substring(0, message.lastIndexOf(' ')).trim();
+                        }
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+
+                } else {
+                    dialog("");
+                }
+                break;
+            case "send":
+                if (second.equals("to") && contacts.containsKey(third)) {
+                    contactName = third;
+                    if (tokens.length > 3) {
+                        message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+                } else if (contacts.containsKey(second)) {
+                    contactName = second;
+                    if (tokens.length > 3) {
+                        message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+                } else if (contacts.containsKey(last)) {
+                    contactName = last;
+                    if (tokens.length > 3) {
+                        message = sentence.substring("send".length(), sentence.indexOf(last)).trim();
+                        if (message.substring(message.lastIndexOf(' '), message.length()).contains("to")) {
+                            message = message.substring(0, message.lastIndexOf(' ')).trim();
+                        }
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+                } else {
+                    dialog("");
+                }
+                break;
+            case "text":
+                if (second.equals("to") && contacts.containsKey(third)) {
+                    contactName = third;
+                    if (tokens.length > 3) {
+                        message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+                } else if (contacts.containsKey(second)) {
+                    contactName = second;
+                    if (tokens.length > 3) {
+                        message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+                } else if (contacts.containsKey(last)) {
+                    contactName = last;
+                    if (tokens.length > 3) {
+                        message = sentence.substring("text".length(), sentence.indexOf(last)).trim();
+                        if (message.substring(message.lastIndexOf(' '), message.length()).contains("to")) {
+                            message = message.substring(0, message.lastIndexOf(' ')).trim();
+                        }
+                        dialog_step = 3;
+                        dialog("");
+                    } else {
+                        dialog_step++;
+                        dialog(contactName);
+                    }
+                } else {
+                    dialog("");
+                }
+                break;
+            default:
+                dialog("");
+                break;
+        }
     }
 
     @Override

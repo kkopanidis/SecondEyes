@@ -17,11 +17,28 @@ public class Call extends Action {
      */
     public Call(String sentence, Activity callback) {
         super(sentence, callback);
-        dialog("");
     }
 
     @Override
     protected void analyzeSentence() {
+        this.name = "";
+        String sentence_proc = sentence.toLowerCase();
+        String[] tokens = sentence_proc.split("\\s");
+        for (int i = 0; i < tokens.length; i++)
+            if (tokens[i].equals("call"))
+                if (i + 2 < tokens.length && tokens[i + 1].equalsIgnoreCase("to")) {
+                    this.name = tokens[i + 2];
+                    break;
+                } else if (i + 1 < tokens.length) {
+                    this.name = tokens[i + 1];
+                    break;
+                }
+        if (!this.name.equals("")) {
+            dialog_step += 1;
+            dialog(this.name);
+        }
+        else
+            dialog("");
     }
 
     @Override
@@ -36,7 +53,7 @@ public class Call extends Action {
                     return false;
             }
         } else if (answer.equalsIgnoreCase("no")) {
-            if(dialog_step == 0)
+            if (dialog_step == 0)
                 return true;
             ((MainWindow) callback).approveAction("Hm i thought i got it right," +
                     " can you repeat the name again?"
@@ -51,16 +68,16 @@ public class Call extends Action {
                         , true);
                 return false;
             case 2:
-                if(!getContacts()) {
+                if (!getContacts()) {
                     dialog_step = 0;
                     ((MainWindow) callback).approveAction("It seems that i could not find the number," +
                             "would you like to give me another name?"
                             , true);
-                }
-                else {
+                    return false;
+                } else {
                     executeCommand();
+                    return true;
                 }
-                return true;
             default:
                 return false;
         }
