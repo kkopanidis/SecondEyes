@@ -42,19 +42,28 @@ public class Contact extends Action {
                 dialog(name);
             } else {
                 dialog_step = 2;
+                if (!inputCheck(this.name) || !numberInputCheck(this.number)) {
+                    dialog_step = 1;
+                    ((MainWindow) callback).approveAction("Silly me i heard wrong, " +
+                            "let's go over this again. What will the name of the contact be?", true);
+                    return;
+                }
+
                 ((MainWindow) callback).approveAction("I will add a new contact with name "
                         + this.name + " ,and number "
                         + this.number + " .Is that correct?", true);
             }
-        }
-        else
+        } else
             dialog("");
 
     }
 
     @Override
     protected boolean dialog(String answer) {
-        if(answer.equals("cancel")) {
+        if (answer.trim().equalsIgnoreCase("cancel")
+                || answer.trim().equalsIgnoreCase("cancelled")
+                || answer.trim().equalsIgnoreCase("canceled")) {
+
             ((MainWindow) callback).approveAction("Cancelled!"
                     , false);
             return true;
@@ -62,16 +71,28 @@ public class Contact extends Action {
         if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
             switch (dialog_step) {
                 case 1:
-                    this.name = answer;
-                    ((MainWindow) callback).approveAction("The contact name is:"
-                            + this.name + " is that correct?"
-                            , true);
+                    if (inputCheck(answer)) {
+                        this.name = answer;
+                        ((MainWindow) callback).approveAction("The contact name is:"
+                                + this.name + " is that correct?"
+                                , true);
+                    } else {
+                        ((MainWindow) callback).approveAction("Sorry, i didn't catch the name, " +
+                                "please say it again"
+                                , true);
+                    }
                     return false;
                 case 2:
-                    this.number = answer;
-                    ((MainWindow) callback).approveAction("The contact's number is:"
-                            + this.number + " is that correct?"
-                            , true);
+                    if (numberInputCheck(answer)) {
+                        this.number = answer;
+                        ((MainWindow) callback).approveAction("The contact's number is:"
+                                + this.number + " is that correct?"
+                                , true);
+                    } else {
+                        ((MainWindow) callback).approveAction("Sorry, i think i missed a digit, " +
+                                "please say the number again"
+                                , true);
+                    }
                     return false;
             }
         } else if (answer.equalsIgnoreCase("no")) {
@@ -144,5 +165,23 @@ public class Contact extends Action {
             e.printStackTrace();
             Toast.makeText(callback, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    protected boolean inputCheck(String input) {
+
+        for (char c : input.toCharArray()) {
+            if (!Character.isAlphabetic(c) && !Character.isDigit(c))
+                return false;
+        }
+        return true;
+    }
+
+    protected boolean numberInputCheck(String input) {
+        for (char c : input.toCharArray()) {
+            if ((Character.isAlphabetic(c) || !Character.isDigit(c)) && c != '-')
+                return false;
+        }
+        return true;
     }
 }

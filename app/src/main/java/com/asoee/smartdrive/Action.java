@@ -37,4 +37,6 @@ public abstract class Action {
      */
     public abstract void executeCommand();
 
+    protected abstract boolean inputCheck(String input);
+
 }

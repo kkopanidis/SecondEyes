@@ -20,27 +20,27 @@ public class Alarm extends Action {
     protected void analyzeSentence() {
         time = "";
         String sentence_proc = sentence.toLowerCase();
-        String[] tokens = sentence_proc.substring(sentence_proc.indexOf("alarm") + "alarm".length()).split("\\s");
-        if (tokens[0].equals("for"))
+        String[] tokens = sentence_proc.substring(sentence_proc.indexOf("alarm") + "alarm".length()).trim().split("\\s");
+        if (tokens[0].equals("for")) {
             time = tokens[1];
-        else if (!tokens[0].equals(""))
-            time = tokens[0];
-        else if (tokens[0].equals(""))
-            time = tokens[1];
-
-
-        if (time.equals(""))
-            dialog("");
-        else {
-            dialog_step++;
-            dialog(time);
+        } else {
+            time = sentence_proc.substring(sentence_proc.indexOf("alarm") + "alarm".length());
         }
+        if (time.equals("")) {
+            dialog("");
+            return;
+        }
+        dialog_step++;
+        dialog(time);
 
     }
 
     @Override
     protected boolean dialog(String answer) {
-        if(answer.equals("cancel")) {
+        if (answer.trim().equalsIgnoreCase("cancel")
+                || answer.trim().equalsIgnoreCase("cancelled")
+                || answer.trim().equalsIgnoreCase("canceled")) {
+
             ((MainWindow) callback).approveAction("Cancelled!"
                     , false);
             return true;
@@ -48,10 +48,16 @@ public class Alarm extends Action {
         if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
             switch (dialog_step) {
                 case 1:
-                    this.time = answer;
-                    ((MainWindow) callback).approveAction("The alarm will be set for:"
-                            + this.time + " is that correct?"
-                            , true);
+                    if (inputCheck(answer)) {
+                        this.time = answer;
+                        ((MainWindow) callback).approveAction("The alarm will be set for:"
+                                + this.time + " is that correct?"
+                                , true);
+                    } else {
+                        ((MainWindow) callback).approveAction("Sorry, i didn't catch the time, " +
+                                "please say it again"
+                                , true);
+                    }
                     return false;
             }
         } else if (answer.equalsIgnoreCase("no")) {
@@ -89,6 +95,22 @@ public class Alarm extends Action {
         alarm.putExtra(AlarmClock.EXTRA_SKIP_UI, true);
         callback.startActivity(alarm);
         time = null;
+    }
+
+    @Override
+    protected boolean inputCheck(String input) {
+        if (input.equals(""))
+            return false;
+        if (input.contains("and"))
+            input.replace("and", ":");
+        input.replaceAll(" ", "");
+        if (!input.contains(":"))
+            return false;
+        for (char c : input.toCharArray()) {
+            if (!Character.isDigit(c) && c != ':')
+                return false;
+        }
+        return true;
     }
 
 

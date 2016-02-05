@@ -108,7 +108,10 @@ public class Music extends Action {
 
     @Override
     protected boolean dialog(String answer) {
-        if(answer.equals("cancel")) {
+        if (answer.trim().equalsIgnoreCase("cancel")
+                || answer.trim().equalsIgnoreCase("cancelled")
+                || answer.trim().equalsIgnoreCase("canceled")) {
+
             ((MainWindow) callback).approveAction("Cancelled!"
                     , false);
             return true;
@@ -232,5 +235,10 @@ public class Music extends Action {
     public void executeCommand() {
         MediaPlayer player = MediaPlayer.create(callback, Uri.parse(songPath));
         player.start();
+    }
+
+    @Override
+    protected boolean inputCheck(String input) {
+        return false;
     }
 }

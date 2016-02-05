@@ -81,6 +81,11 @@ public class Map extends Action {
         }
     }
 
+    @Override
+    protected boolean inputCheck(String input) {
+        return false;
+    }
+
     private String convertToLatin(String str) {
         if (str == null || str.trim().equals("")) return null;
 

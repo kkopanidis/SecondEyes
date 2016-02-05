@@ -86,8 +86,7 @@ public class Message extends Action {
                     contactName = third;
                     if (tokens.length > 3) {
                         message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
-                        dialog_step = 3;
-                        dialog("");
+                        approveMessage();
                     } else {
                         dialog_step++;
                         dialog(contactName);
@@ -96,8 +95,7 @@ public class Message extends Action {
                     contactName = second;
                     if (tokens.length > 3) {
                         message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
-                        dialog_step = 3;
-                        dialog("");
+                        approveMessage();
                     } else {
                         dialog_step++;
                         dialog(contactName);
@@ -109,8 +107,7 @@ public class Message extends Action {
                         if (message.substring(message.lastIndexOf(' '), message.length()).contains("to")) {
                             message = message.substring(0, message.lastIndexOf(' ')).trim();
                         }
-                        dialog_step = 3;
-                        dialog("");
+                        approveMessage();
                     } else {
                         dialog_step++;
                         dialog(contactName);
@@ -124,8 +121,7 @@ public class Message extends Action {
                     contactName = third;
                     if (tokens.length > 3) {
                         message = sentence.substring(sentence.indexOf(third) + third.length(), sentence.length());
-                        dialog_step = 3;
-                        dialog("");
+                        approveMessage();
                     } else {
                         dialog_step++;
                         dialog(contactName);
@@ -134,8 +130,7 @@ public class Message extends Action {
                     contactName = second;
                     if (tokens.length > 3) {
                         message = sentence.substring(sentence.indexOf(second) + second.length(), sentence.length());
-                        dialog_step = 3;
-                        dialog("");
+                        approveMessage();
                     } else {
                         dialog_step++;
                         dialog(contactName);
@@ -147,8 +142,8 @@ public class Message extends Action {
                         if (message.substring(message.lastIndexOf(' '), message.length()).contains("to")) {
                             message = message.substring(0, message.lastIndexOf(' ')).trim();
                         }
-                        dialog_step = 3;
-                        dialog("");
+                        approveMessage();
+
                     } else {
                         dialog_step++;
                         dialog(contactName);
@@ -165,7 +160,7 @@ public class Message extends Action {
 
     @Override
     protected boolean dialog(String answer) {
-        if(answer.equals("cancel")) {
+        if (answer.equals("cancel")) {
             ((MainWindow) callback).approveAction("Cancelled!"
                     , false);
             return true;
@@ -229,6 +224,25 @@ public class Message extends Action {
     public void executeCommand() {
         SmsManager.getDefault().sendTextMessage(contacts.get(contactName),
                 null, message, null, null);
+    }
+
+    @Override
+    protected boolean inputCheck(String input) {
+        return false;
+    }
+
+    protected void approveMessage() {
+        dialog_step = 2;
+        if (!contacts.containsKey(this.contactName)) {
+            ((MainWindow) callback).approveAction("Sorry but i could not " +
+                    "find that name in your contact list. Would you like to give another one?"
+                    , true);
+            dialog_step = 0;
+            return;
+        }
+        ((MainWindow) callback).approveAction("You want to text:"
+                + this.contactName + ", " + message + " is that correct?"
+                , true);
     }
 
     void getContacts() {

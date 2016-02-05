@@ -55,4 +55,9 @@ public class DateTime extends Action {
         ((MainWindow)callback).approveAction(tell, false);
 
     }
+
+    @Override
+    protected boolean inputCheck(String input) {
+        return false;
+    }
 }
