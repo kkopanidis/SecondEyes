@@ -143,6 +143,8 @@ public class Music extends Action {
         } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1) {
             if (!music.containsKey(this.artistToPlay)) {
                 dialog_step = 0;
+                this.artistToPlay = "";
+                this.songToPlay = "";
                 ((MainWindow) callback).approveAction("Sorry but I could not " +
                         "find that artist in your music library. Would you like to give another one?"
                         , true);
