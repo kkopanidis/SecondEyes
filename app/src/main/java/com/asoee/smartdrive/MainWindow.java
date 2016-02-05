@@ -206,7 +206,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         if (approval) {
             while (mTts.isSpeaking()) ; //jesus fuck..
             answer();
-        }else {
+        } else {
             action = null;
         }
     }

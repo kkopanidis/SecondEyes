@@ -113,8 +113,7 @@ public class Music extends Action {
                     if (this.artistToPlay.equals("")) //otherwise he has specified the artist
                         this.artistToPlay = answer;
                     ((MainWindow) callback).approveAction("You want to listen to:"
-                            + this.artistToPlay + " is that correct?"
-                            , true);
+                            + this.artistToPlay + " is that correct?", true);
                     return false;
                 case 2:
                     if (this.songToPlay.equals("")) //otherwise he has specified the song
@@ -128,10 +127,17 @@ public class Music extends Action {
         } else if (answer.equalsIgnoreCase("no")) {
             if (dialog_step == 0 && this.artistToPlay.equals("")) {
                 return true;
+            } else {
+                this.artistToPlay = "";
+                ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
+                        " what would you like it to be?", true);
             }
-            ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
-                    " what would you like it to be?"
-                    , true);
+            
+            if (dialog_step == 1) {
+                this.songToPlay = "";
+                ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
+                        " what would you like it to be?", true);
+            }
             return false;
         } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1) {
             if (!music.containsKey(this.artistToPlay)) {
