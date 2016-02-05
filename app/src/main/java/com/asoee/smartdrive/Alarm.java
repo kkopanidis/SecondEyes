@@ -43,7 +43,7 @@ public class Alarm extends Action {
         dialog_step++;
         switch (dialog_step){
             case 1:
-                ((MainWindow)callback).approveAction("Waking up early are we?" +
+                ((MainWindow) callback).approveAction("Waking up early are we?" +      // lel
                         " Tell me the hour and the minute that you want the alarm"
                         , true);
                 return false;

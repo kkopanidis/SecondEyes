@@ -92,14 +92,19 @@ public class Message extends Action {
 
     void getContacts() {
         contacts = new HashMap<>();
-        Cursor contacts = callback.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-        while (contacts.moveToNext()) {
-            String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
-            String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            this.contacts.put(name.toLowerCase(), phoneNumber);
-        }
+        //Cursor contacts = callback.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
-        contacts.close();
+        try ( //advanced Java 7.0+ Project Coin resource management
+              Cursor contacts = callback.getContentResolver()
+                      .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null)
+        ) {
+            if (contacts == null) return; //maybe assert contacts != null; ??
+            while (contacts.moveToNext()) {
+                String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
+                String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                this.contacts.put(name.toLowerCase(), phoneNumber);
+            }
+        } // contacts if going to be closed anyway
     }
 
 }

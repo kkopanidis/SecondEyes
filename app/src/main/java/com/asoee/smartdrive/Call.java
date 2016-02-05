@@ -73,17 +73,20 @@ public class Call extends Action {
     }
 
     boolean getContacts() {
-        Cursor contacts = ((MainWindow) callback).getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
-
-        while (contacts.moveToNext()) {
-            String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
-            String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            if (name.equalsIgnoreCase(this.name)) {
-                number = "tel:" + phoneNumber;
-                return true;
+        try (
+                Cursor contacts = callback.getContentResolver() // it doesn't need a cast, it's an Activity method
+                        .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null)
+        ) {
+            if (contacts == null) return false;
+            while (contacts.moveToNext()) {
+                String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
+                String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                if (name.equalsIgnoreCase(this.name)) {
+                    number = "tel:" + phoneNumber;
+                    return true;
+                }
             }
         }
-        contacts.close();
         return false;
     }
 }

@@ -22,9 +22,9 @@ public class Music extends Action {
     private static final int SONG_NAME = 0;
     //key: artist, value: song and datapath
     static HashMap<String, ArrayList<String[]>> music;
-    String songToPlay;
-    String artistToPlay;
-    String songPath;
+    String songToPlay = "";
+    String artistToPlay = "";
+    String songPath = "";
 
     /**
      * Does constructor stuff
@@ -35,9 +35,8 @@ public class Music extends Action {
         super(sentence, callback);
         music = new HashMap<>();
         analyzeSentence();
-        populateMusic();
-        findSongPath();
-        executeCommand();
+        populateMusic(); //to check if its best after or before analyzeSentence or dialog in terms of
+        //usability
     }
 
     /**
@@ -52,23 +51,20 @@ public class Music extends Action {
         //not sure if possible
         //maybe have a Context musicQ as argument, don't know how to use it
 
-        Cursor cursor = callback.getContentResolver().query(
+        try (Cursor cursor = callback.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 COLS,
                 MUSIC_ONLY,
                 null,
                 null
-        );
-
+        )) {
         /*
         for absolute path maybe we'll need this
          int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
          cursor.moveToFirst();
          ->>> cursor.getString(column_index);
         */
-
-
-        try {
+            if (cursor == null) return;
             while (cursor.moveToNext()) {
                 ArrayList<String[]> values = new ArrayList<>();
 
@@ -82,8 +78,6 @@ public class Music extends Action {
                 }
 
             }
-            cursor.close();
-        } catch (NullPointerException ignore) {
         }
 
     }
@@ -99,21 +93,13 @@ public class Music extends Action {
         for (int i = 0; i < tokens.length; ++i) {
             word = tokens[i];
             switch (word) {
-                case "play":
-                    this.songToPlay = this.artistToPlay = sentence.substring(i + "play".length()).trim();
-                    break;
-                case "listen":
-                    if (tokens[i + 1].equalsIgnoreCase("to"))
-                        this.songToPlay = this.artistToPlay = sentence.substring(i + 2);
-                    break;
                 case "from":
+                case "by":
+                case "artist":
                     this.artistToPlay = sentence.substring(i + 1);
                     break;
                 case "song":
                     this.songToPlay = sentence.substring(i + 1);
-                    break;
-                case "artist":
-                    this.artistToPlay = sentence.substring(i + 1);
                     break;
             }
         }
@@ -121,7 +107,82 @@ public class Music extends Action {
 
     @Override
     protected boolean dialog(String answer) {
-        return false;
+        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
+            switch (dialog_step) {
+                case 1:
+                    if (this.artistToPlay.equals("")) //otherwise he has specified the artist
+                        this.artistToPlay = answer;
+                    ((MainWindow) callback).approveAction("You want to listen to:"
+                            + this.artistToPlay + " is that correct?"
+                            , true);
+                    return false;
+                case 2:
+                    if (this.songToPlay.equals("")) //otherwise he has specified the song
+                        this.songToPlay = answer;
+                    ((MainWindow) callback).approveAction("You want to listen to:"
+                            + this.artistToPlay + " by " + this.artistToPlay
+                            + " is that correct?"
+                            , true);
+                    return false;
+            }
+        } else if (answer.equalsIgnoreCase("no")) {
+            if (dialog_step == 0 && this.artistToPlay.equals("")) {
+                return true;
+            }
+            ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
+                    " what would you like it to be?"
+                    , true);
+            return false;
+        } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1) {
+            if (!music.containsKey(this.artistToPlay)) {
+                ((MainWindow) callback).approveAction("Sorry but I could not " +
+                        "find that artist in your music library. Would you like to give another one?"
+                        , true);
+                dialog_step = 0;
+                return false;
+            }
+        } else if (answer.equalsIgnoreCase("yes") && dialog_step == 2) {
+            //check if song exists
+            boolean found = false;
+            ArrayList<String[]> values = music.get(this.artistToPlay);
+            for (String[] value : values) {
+                if (value[SONG_NAME].equalsIgnoreCase(this.songToPlay)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                ((MainWindow) callback).approveAction("Sorry but I could not " +
+                        "find " + this.songPath + " by " + this.artistToPlay +
+                        "in your music library. Would you like to give another one?"
+                        , true);
+                dialog_step = 1;
+                return false;
+            }
+        }
+
+        dialog_step++;
+        switch (dialog_step) {
+            case 1:
+                ((MainWindow) callback).approveAction("Ok, what artist?", true);
+                return false;
+            case 2:
+                ((MainWindow) callback).approveAction("Great! What song would you like?", true);
+                return false;
+            case 3:
+                ((MainWindow) callback).approveAction("Nice choice! Enjoy!", false);
+                findSongPath(); //find dat song path pls
+                if (songPath.equals("")) {
+                    ((MainWindow) callback).approveAction("Sorry, couldn't locate the song in your phone" +
+                            "for some reason.", false); //or maybe restart the dialog, whatever
+                    return false;
+                } else {
+                    executeCommand();
+                    return true;
+                }
+            default:
+                return false;
+        }
     }
 
     /**
@@ -152,11 +213,7 @@ public class Music extends Action {
     //Changed the functionality of the method you need to make changes(duh..)
     @Override
     public void executeCommand() {
-
-        if (songPath == null)
-            return;
         MediaPlayer player = MediaPlayer.create(callback, Uri.parse(songPath));
         player.start();
-
     }
 }

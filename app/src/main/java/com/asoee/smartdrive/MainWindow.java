@@ -4,9 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,11 +21,11 @@ import java.util.Locale;
 
 public class MainWindow extends Activity implements TextToSpeech.OnInitListener {
 
+    public static boolean approval = false;
     HashMap<String, String> keywords;
+    Action action;
     private TextToSpeech mTts;
     private boolean locked = false;
-    Action action;
-    public static boolean approval = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,12 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         keywords = new HashMap<>();
         populateMap();
         Intent checkIntent = new Intent();
+
+        Vibrator v;
+        v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        v.vibrate(500);
+
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkIntent, 567);
     }
@@ -101,6 +107,23 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
                 return;
             locked = true;
             //Currently not convenient, will be refined
+
+            /*
+             * How about:
+             *
+             * import java.lang.reflect.*;
+
+             String sentence = voiceResult.getSentence();
+             MainWindow thisActivity = this;
+             String className = voiceResult.getKeyword();
+             className = className.substring(0, 1).toUpperCase() + className.substring(1); //Capitalize first letter
+             Class resultClass = Class.forName(className);
+             Constructor constructor = resultClass.getConstructor(sentence.class, thisActivity.class);
+             Object action = constructor.newInstance(sentence, thisActivity);
+
+             *
+             * instead of switch
+             */
             switch (voiceResult.getKeyword()) {
                 case "message":
                     action = new Message(voiceResult.getSentence(), this);
