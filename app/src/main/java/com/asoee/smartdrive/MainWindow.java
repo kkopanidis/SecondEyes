@@ -97,7 +97,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
             ArrayList<String> thingsYouSaid = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             //Retrieve the user's answer to the approval
             if (action != null) {
-                if (action.dialog(thingsYouSaid.get(0)))
+                if (action.dialog(thingsYouSaid.get(0).toLowerCase()))
                     action = null;
                 return;
             }

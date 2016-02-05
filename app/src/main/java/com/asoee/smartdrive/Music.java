@@ -70,11 +70,11 @@ public class Music extends Action {
 
                 if (music.containsKey(cursor.getString(0))) {
                     values = music.get(cursor.getString(0));
-                    values.add(new String[]{cursor.getString(1), cursor.getString(2)});
-                    music.put(cursor.getString(0), values);
+                    values.add(new String[]{cursor.getString(1).toLowerCase(), cursor.getString(2)});
+                    music.put(cursor.getString(0).toLowerCase(), values);
                 } else {
-                    values.add(new String[]{cursor.getString(1), cursor.getString(2)});
-                    music.put(cursor.getString(0), values);
+                    values.add(new String[]{cursor.getString(1).toLowerCase(), cursor.getString(2)});
+                    music.put(cursor.getString(0).toLowerCase(), values);
                 }
 
             }
@@ -107,7 +107,8 @@ public class Music extends Action {
 
     @Override
     protected boolean dialog(String answer) {
-        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
+        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")
+                && !answer.equals("music")) {
             switch (dialog_step) {
                 case 1:
                     if (this.artistToPlay.equals("")) //otherwise he has specified the artist
@@ -119,7 +120,7 @@ public class Music extends Action {
                     if (this.songToPlay.equals("")) //otherwise he has specified the song
                         this.songToPlay = answer;
                     ((MainWindow) callback).approveAction("You want to listen to:"
-                            + this.artistToPlay + " by " + this.artistToPlay
+                            + this.songToPlay + " by " + this.artistToPlay
                             + " is that correct?"
                             , true);
                     return false;
@@ -127,13 +128,13 @@ public class Music extends Action {
         } else if (answer.equalsIgnoreCase("no")) {
             if (dialog_step == 0 && this.artistToPlay.equals("")) {
                 return true;
-            } else {
+            } else if (dialog_step == 1) {
                 this.artistToPlay = "";
                 ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
                         " what would you like it to be?", true);
             }
-            
-            if (dialog_step == 1) {
+
+            if (dialog_step == 2) {
                 this.songToPlay = "";
                 ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
                         " what would you like it to be?", true);
@@ -141,10 +142,10 @@ public class Music extends Action {
             return false;
         } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1) {
             if (!music.containsKey(this.artistToPlay)) {
+                dialog_step = 0;
                 ((MainWindow) callback).approveAction("Sorry but I could not " +
                         "find that artist in your music library. Would you like to give another one?"
                         , true);
-                dialog_step = 0;
                 return false;
             }
         } else if (answer.equalsIgnoreCase("yes") && dialog_step == 2) {
@@ -170,11 +171,11 @@ public class Music extends Action {
         dialog_step++;
         switch (dialog_step) {
             case 1:
-                if (!this.artistToPlay.equals(""))
+                if (this.artistToPlay.equals(""))
                     ((MainWindow) callback).approveAction("Ok, what artist?", true);
                 return false;
             case 2:
-                if (!this.songToPlay.equals(""))
+                if (this.songToPlay.equals(""))
                     ((MainWindow) callback).approveAction("Great! What song would you like?", true);
                 return false;
             case 3:
