@@ -67,14 +67,15 @@ public class Music extends Action {
             if (cursor == null) return;
             while (cursor.moveToNext()) {
                 ArrayList<String[]> values = new ArrayList<>();
+                String cursorArtist = cursor.getString(0).toLowerCase();
 
-                if (music.containsKey(cursor.getString(0))) {
-                    values = music.get(cursor.getString(0));
+                if (music.containsKey(cursorArtist)) {
+                    values = music.get(cursorArtist);
                     values.add(new String[]{cursor.getString(1), cursor.getString(2)});
-                    music.put(cursor.getString(0).toLowerCase(), values);
+                    music.put(cursorArtist, values);
                 } else {
                     values.add(new String[]{cursor.getString(1), cursor.getString(2)});
-                    music.put(cursor.getString(0).toLowerCase(), values);
+                    music.put(cursorArtist, values);
                 }
 
             }
