@@ -40,6 +40,11 @@ public class Alarm extends Action {
 
     @Override
     protected boolean dialog(String answer) {
+        if(answer.equals("cancel")) {
+            ((MainWindow) callback).approveAction("Cancelled!"
+                    , false);
+            return true;
+        }
         if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
             switch (dialog_step) {
                 case 1:
