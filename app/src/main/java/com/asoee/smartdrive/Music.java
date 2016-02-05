@@ -164,10 +164,12 @@ public class Music extends Action {
         dialog_step++;
         switch (dialog_step) {
             case 1:
-                ((MainWindow) callback).approveAction("Ok, what artist?", true);
+                if (!this.artistToPlay.equals(""))
+                    ((MainWindow) callback).approveAction("Ok, what artist?", true);
                 return false;
             case 2:
-                ((MainWindow) callback).approveAction("Great! What song would you like?", true);
+                if (!this.songToPlay.equals(""))
+                    ((MainWindow) callback).approveAction("Great! What song would you like?", true);
                 return false;
             case 3:
                 ((MainWindow) callback).approveAction("Nice choice! Enjoy!", false);
