@@ -1,10 +1,8 @@
 package com.asoee.smartdrive;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
@@ -35,10 +33,11 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         populateMap();
         Intent checkIntent = new Intent();
 
-        Vibrator v;
+        // mu krasarei
+       /* Vibrator v;
         v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 500 milliseconds
-        v.vibrate(500);
+        v.vibrate(500);*/
 
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkIntent, 567);
