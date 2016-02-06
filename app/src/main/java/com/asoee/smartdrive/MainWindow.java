@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +25,6 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     HashMap<String, String> keywords;
     Action action;
     private TextToSpeech mTts;
-    private boolean locked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,50 +105,19 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
             VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
             if (voiceResult == null)
                 return;
-            locked = true;
-            //Currently not convenient, will be refined
-
-            /*
-             * How about:
-             *
-             * import java.lang.reflect.*;
-
-             String sentence = voiceResult.getSentence();
-             MainWindow thisActivity = this;
-             String className = voiceResult.getKeyword();
-             className = className.substring(0, 1).toUpperCase() + className.substring(1); //Capitalize first letter
-             Class resultClass = Class.forName(className);
-             Constructor constructor = resultClass.getConstructor(sentence.class, thisActivity.class);
-             Object action = constructor.newInstance(sentence, thisActivity);
-
-             *
-             * instead of switch
-             */
-            switch (voiceResult.getKeyword()) {
-                case "message":
-                    action = new Message(voiceResult.getSentence(), this);
-                    break;
-                case "music":
-                    action = new Music(voiceResult.getSentence(), this);
-                    break;
-                case "map":
-                    action = new Map(voiceResult.getSentence(), this);
-                    break;
-                case "alarm":
-                    action = new Alarm(voiceResult.getSentence(), this);
-                    break;
-                case "call":
-                    action = new Call(voiceResult.getSentence(), this);
-                    break;
-                case "time":
-                    action = new DateTime(voiceResult.getSentence(), this);
-                    break;
-                case "contact":
-                    action = new Contact(voiceResult.getSentence(), this);
-                    break;
-                default:
-                    break;
+            String sentence = voiceResult.getSentence();
+            MainWindow thisActivity = this;
+            String className = voiceResult.getKeyword();
+            className = className.substring(0, 1).toUpperCase() + className.substring(1); //Capitalize first letter
+            Class resultClass = null;
+            try {
+                resultClass = Class.forName("com.asoee.smartdrive." + className);
+                Constructor constructor = resultClass.getConstructor(String.class, Activity.class);
+                action = (Action) constructor.newInstance(sentence, thisActivity);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
             VocalResult.destroy();
         }
     }
@@ -193,7 +163,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
-            mTts.speak("Welcome, how may i help you",
+            mTts.speak("Welcome, how may i help you?",
                     TextToSpeech.QUEUE_FLUSH, null, null);
 
         }
