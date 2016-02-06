@@ -9,6 +9,7 @@ import android.provider.ContactsContract;
 public class Call extends Action {
     String name;
     String number;
+    int mode = 0;
 
     /**
      * Does constructor stuff
@@ -81,6 +82,12 @@ public class Call extends Action {
                         , true);
                 return false;
             case 2:
+                if (mode == 1) {
+                    number = "tel:" + name;
+                    executeCommand();
+                    return true;
+                }
+
                 if (!getContacts()) {
                     dialog_step = 0;
                     ((MainWindow) callback).approveAction("It seems that i could not find the number," +
@@ -104,12 +111,20 @@ public class Call extends Action {
 
     @Override
     protected boolean inputCheck(String input) {
+        boolean pureAlpha = true;
+        boolean pureDigit = true;
         for (char c : input.toCharArray()) {
-            if (!Character.isAlphabetic(c)) {
-                return false;
+            if (Character.isAlphabetic(c)) {
+                pureDigit = false;
+                mode = 0;
+            } else if (Character.isDigit(c)) {
+                pureAlpha = false;
+                mode = 1;
             }
+
         }
-        return true;
+
+        return pureDigit != pureAlpha;
     }
 
     boolean getContacts() {

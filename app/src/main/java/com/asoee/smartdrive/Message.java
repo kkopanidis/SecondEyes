@@ -2,6 +2,7 @@ package com.asoee.smartdrive;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
 
@@ -12,6 +13,7 @@ public class Message extends Action {
     private String message;
     private String contactName;
     private HashMap<String, String> contacts;
+    int mode = 0;
 
     /**
      * Does constructor stuff
@@ -168,11 +170,17 @@ public class Message extends Action {
         if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
             switch (dialog_step) {
                 case 1:
-                    this.contactName = answer;
-                    ((MainWindow) callback).approveAction("You want to send a message to:"
-                            + this.contactName + " is that correct?"
-                            , true);
-                    return false;
+                    if (inputCheck(answer)) {
+                        this.contactName = answer;
+                        ((MainWindow) callback).approveAction("You want to send a message to:"
+                                + this.contactName + " is that correct?"
+                                , true);
+                        return false;
+                    } else {
+                        ((MainWindow) callback).approveAction("I think i heard the receiver wrong," +
+                                "can you repeat it for me please?"
+                                , true);
+                    }
                 case 2:
                     this.message = answer;
                     ((MainWindow) callback).approveAction("You want the message to say:"
@@ -188,7 +196,7 @@ public class Message extends Action {
                     " what would you like it to be?"
                     , true);
             return false;
-        } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1) {
+        } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1 && mode == 0) {
             getContacts();
             if (!contacts.containsKey(this.contactName)) {
                 ((MainWindow) callback).approveAction("Sorry but i could not " +
@@ -222,13 +230,31 @@ public class Message extends Action {
 
     @Override
     public void executeCommand() {
+        if (mode == 1) {
+            SmsManager.getDefault().sendTextMessage("tel:" + contactName,
+                    null, message, null, null);
+            return;
+        }
         SmsManager.getDefault().sendTextMessage(contacts.get(contactName),
                 null, message, null, null);
     }
 
     @Override
     protected boolean inputCheck(String input) {
-        return false;
+        boolean pureAlpha = true;
+        boolean pureDigit = true;
+        for (char c : input.toCharArray()) {
+            if (Character.isAlphabetic(c)) {
+                pureDigit = false;
+                mode = 0;
+            } else if (Character.isDigit(c)) {
+                pureAlpha = false;
+                mode = 1;
+            }
+
+        }
+
+        return pureDigit != pureAlpha;
     }
 
     protected void approveMessage() {
