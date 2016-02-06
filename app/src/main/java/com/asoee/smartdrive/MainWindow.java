@@ -28,23 +28,27 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     HashMap<String, String> keywords = new HashMap<>();
     Action action;
     private TextToSpeech mTts;
+    Vibrator v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_window);
         populateMap();
-        Vibrator v;
         v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-        // Vibrate for 500 milliseconds
-        v.vibrate(500);//*/
-
         Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkIntent, 567);
     }
 
+    protected void onDestroy() {
+        super.onDestroy();
+        mTts.shutdown();
+    }
+
     public void onClickSpeechDetection(View view) {
+        // Vibrate for 500 milliseconds
+        v.vibrate(500);//*/
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
         try {
@@ -139,22 +143,22 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
-            SharedPreferences pref = getSharedPreferences("com.asoee.smartdrive",MODE_PRIVATE);
-            if(pref.contains("init"))
+            SharedPreferences pref = getSharedPreferences("com.asoee.smartdrive", MODE_PRIVATE);
+            if (pref.contains("init"))
                 mTts.speak("Welcome! Tap on the screen and tell me how i can help you!",
                         TextToSpeech.QUEUE_FLUSH, null, null);
-            else{
-                pref.edit().putBoolean("init",true).commit();
+            else {
+                pref.edit().putBoolean("init", true).commit();
                 String greeting = "";
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(getResources().openRawResource(
                             getResources().getIdentifier("raw/first_greet",
                                     "raw", getPackageName()))));
                     String line = br.readLine().trim();
-                    do{
+                    do {
                         greeting += line;
                         line = br.readLine().trim();
-                    }while(line!=null && line.length() != 0);
+                    } while (line != null && line.length() != 0);
                 } catch (Exception ignore) {
                 }
                 mTts.speak(greeting,
