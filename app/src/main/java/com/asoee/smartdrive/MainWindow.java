@@ -1,8 +1,11 @@
 package com.asoee.smartdrive;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
@@ -22,7 +25,7 @@ import java.util.Locale;
 public class MainWindow extends Activity implements TextToSpeech.OnInitListener {
 
     public static boolean approval = false;
-    HashMap<String, String> keywords;
+    HashMap<String, String> keywords = new HashMap<>();
     Action action;
     private TextToSpeech mTts;
 
@@ -30,40 +33,15 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_window);
-        keywords = new HashMap<>();
         populateMap();
-        Intent checkIntent = new Intent();
-
-        // mu krasarei
-       /* Vibrator v;
+        Vibrator v;
         v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 500 milliseconds
-        v.vibrate(500);*/
+        v.vibrate(500);//*/
 
+        Intent checkIntent = new Intent();
         checkIntent.setAction(TextToSpeech.Engine.ACTION_CHECK_TTS_DATA);
         startActivityForResult(checkIntent, 567);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main_window, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void onClickSpeechDetection(View view) {
@@ -144,8 +122,6 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     }
 
     void populateMap() {
-
-        URL keywordsFile = MainWindow.class.getResource("../res/commands/keywords");
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(getResources().openRawResource(
                     getResources().getIdentifier("raw/keywords",
@@ -163,8 +139,27 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
-            mTts.speak("Welcome, how may i help you?",
-                    TextToSpeech.QUEUE_FLUSH, null, null);
+            SharedPreferences pref = getSharedPreferences("com.asoee.smartdrive",MODE_PRIVATE);
+            if(pref.contains("init"))
+                mTts.speak("Welcome! Tap on the screen and tell me how i can help you!",
+                        TextToSpeech.QUEUE_FLUSH, null, null);
+            else{
+                pref.edit().putBoolean("init",true).commit();
+                String greeting = "";
+                try {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(getResources().openRawResource(
+                            getResources().getIdentifier("raw/first_greet",
+                                    "raw", getPackageName()))));
+                    String line = br.readLine().trim();
+                    do{
+                        greeting += line;
+                        line = br.readLine().trim();
+                    }while(line!=null && line.length() != 0);
+                } catch (Exception ignore) {
+                }
+                mTts.speak(greeting,
+                        TextToSpeech.QUEUE_FLUSH, null, null);
+            }
 
         }
     }
