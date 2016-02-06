@@ -3,12 +3,14 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainWindow">
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainWindow"
+    android:background="#ffffff">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/imageView"
         android:src="@drawable/butn"
-        android:onClick="onClickSpeechDetection" />
+        android:onClick="onClickSpeechDetection"
+        android:background="#ffffff" />
 </RelativeLayout>
