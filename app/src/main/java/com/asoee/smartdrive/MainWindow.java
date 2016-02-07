@@ -25,6 +25,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     Action action;
     Vibrator v;
     private TextToSpeech mTts;
+    private boolean locked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,8 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     }
 
     public void onClickSpeechDetection(View view) {
+        if (locked)
+            return;
         // Vibrate for 300 milliseconds
         v.vibrate(300);//*/
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -140,25 +143,33 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
             SharedPreferences pref = getSharedPreferences("com.asoee.smartdrive", MODE_PRIVATE);
-            if (pref.contains("init"))
+            if (pref.contains("init")) {
+                locked = true;
                 mTts.speak("Welcome! Tap on the screen and tell me how i can help you!",
                         TextToSpeech.QUEUE_FLUSH, null, null);
-            else {
-                pref.edit().putBoolean("init", true).commit();
+                while (mTts.isSpeaking()) ; //jesus fuck..
+                locked = false;
+            } else {
+                pref.edit().putBoolean("init", true).apply();
                 String greeting = "";
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(getResources().openRawResource(
                             getResources().getIdentifier("raw/first_greet",
                                     "raw", getPackageName()))));
-                    String line = br.readLine().trim();
+                    String line = br.readLine();
                     do {
+                        line = line.trim();
                         greeting += line;
-                        line = br.readLine().trim();
+                        line = br.readLine();
                     } while (line != null && line.length() != 0);
                 } catch (Exception ignore) {
                 }
+
+                locked = true;
                 mTts.speak(greeting,
                         TextToSpeech.QUEUE_FLUSH, null, null);
+                while (mTts.isSpeaking()) ; //jesus fuck..
+                locked = false;
             }
 
         }
@@ -166,14 +177,16 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
 
     public void approveAction(String approval_request, boolean approval) {
         MainWindow.approval = approval;
+        locked = true;
         mTts.speak(approval_request,
                 TextToSpeech.QUEUE_FLUSH, null, null);
-        if (approval) {
-            while (mTts.isSpeaking()) ; //jesus fuck..
+        while (mTts.isSpeaking()) ; //jesus fuck..
+        locked = false;
+        if (approval)
             answer();
-        } else {
+        else
             action = null;
-        }
+
     }
 
     public void answer() {
