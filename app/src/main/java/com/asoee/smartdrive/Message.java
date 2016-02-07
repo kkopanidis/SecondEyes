@@ -22,7 +22,7 @@ public class Message extends Action {
      */
     public Message(String sentence, Activity callback) {
         super(sentence, callback);
-        dialog("");
+        //dialog("");
     }
 
     @Override

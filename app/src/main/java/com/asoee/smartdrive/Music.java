@@ -31,6 +31,7 @@ public class Music extends Action {
      *
      * @param sentence the sentence given
      */
+    //TODO CHECK YOUR CALLS. ANALYZE SENTENCE WILL BE CALLED TWICE!(FIX NEEDED)
     public Music(String sentence, Activity callback) {
         super(sentence, callback);
         music = new HashMap<>();
