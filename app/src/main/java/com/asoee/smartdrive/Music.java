@@ -22,9 +22,12 @@ public class Music extends Action {
     private static final int SONG_NAME = 0;
     //key: artist, value: song and datapath
     static HashMap<String, ArrayList<String[]>> music;
+
     String songToPlay = "";
     String artistToPlay = "";
     String songPath = "";
+
+    MediaPlayer player;
 
     /**
      * Does constructor stuff
@@ -33,9 +36,15 @@ public class Music extends Action {
      */
     public Music(String sentence, Activity callback) {
         super(sentence, callback);
-        music = new HashMap<>();
-        populateMusic(); //to check if its best after or before analyzeSentence or dialog in terms of
-        //usability
+        if (music == null) {
+            music = new HashMap<>();
+            populateMusic(); //to check if its best after or before analyzeSentence or dialog in terms of
+            //usability
+        } else {
+            if (music.isEmpty()) {
+                populateMusic();
+            }
+        }
     }
 
     /**
@@ -46,9 +55,10 @@ public class Music extends Action {
         // File sdcard = Environment.getExternalStorageDirectory(); //this also looks like a bad idea
         //as it relies on absolute sdcard paths
 
-
         //not sure if possible
         //maybe have a Context musicQ as argument, don't know how to use it
+
+        //((MainWindow) callback).approveAction("Ok, please be patient while I load your music.", true);
 
         try (Cursor cursor = callback.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -76,10 +86,9 @@ public class Music extends Action {
                     values.add(new String[]{cursor.getString(1), cursor.getString(2)});
                     music.put(cursorArtist, values);
                 }
-
             }
         }
-
+        //((MainWindow) callback).approveAction("Ok, done!", true);
     }
 
     /**
@@ -89,6 +98,8 @@ public class Music extends Action {
     protected void analyzeSentence() {
         String[] tokens = sentence.split("\\s+");
         String word;
+        this.artistToPlay = "";
+        this.songToPlay = "";
         //let's assume (s)he'll choose a song and not something containing the artist, album, or all of them
         for (int i = 0; i < tokens.length; ++i) {
             word = tokens[i];
@@ -96,12 +107,32 @@ public class Music extends Action {
                 case "from":
                 case "by":
                 case "artist":
-                    this.artistToPlay = sentence.substring(i + 1);
+                    for (int j = i + 1; j < tokens.length; j++) {
+                        if (!tokens[j].equals("song")) {
+                            this.artistToPlay += tokens[j] + " ";
+                        }
+                    }
+                    this.artistToPlay = this.artistToPlay.trim();
                     break;
                 case "song":
-                    this.songToPlay = sentence.substring(i + 1);
+                    for (int j = i + 1; j < tokens.length; j++) {
+                        this.songToPlay += tokens[j] + " ";
+                    }
+                    this.songToPlay = this.songToPlay.trim();
                     break;
             }
+        }
+
+        if (!artistToPlay.equals("")) {
+            if (songToPlay.equals("")) {
+                dialog_step = 1;
+                dialog(artistToPlay);
+            } else {
+                dialog_step = 2;
+                dialog(artistToPlay);
+            }
+        } else {
+            dialog("");
         }
     }
 
@@ -115,8 +146,8 @@ public class Music extends Action {
                     , false);
             return true;
         }
-        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")
-                && !answer.equals("music")) {
+
+        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
             switch (dialog_step) {
                 case 1:
                     if (this.artistToPlay.equals("")) //otherwise he has specified the artist
@@ -139,13 +170,13 @@ public class Music extends Action {
             } else if (dialog_step == 1) {
                 this.artistToPlay = "";
                 ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
-                        " what would you like it to be?", true);
+                        " what would you like the artist to be?", true);
             }
 
             if (dialog_step == 2) {
                 this.songToPlay = "";
                 ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
-                        " what would you like it to be?", true);
+                        " what would you like the song to be?", true);
             }
             return false;
         } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1) {
@@ -232,7 +263,7 @@ public class Music extends Action {
     //Changed the functionality of the method you need to make changes(duh..)
     @Override
     public void executeCommand() {
-        MediaPlayer player = MediaPlayer.create(callback, Uri.parse(songPath));
+        player = MediaPlayer.create(callback, Uri.parse(songPath));
         player.start();
     }
 
