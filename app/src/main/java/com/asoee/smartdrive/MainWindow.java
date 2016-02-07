@@ -23,6 +23,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     public static boolean approval = false;
     HashMap<String, String> keywords = new HashMap<>();
     Action action;
+    Music musicAction;
     Vibrator v;
     private TextToSpeech mTts;
     private boolean locked = false;
@@ -50,6 +51,11 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         v.vibrate(300);//*/
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+
+        if (musicAction != null) {
+            musicAction.pause();
+        }
+
         try {
             startActivityForResult(i, 1);
         } catch (Exception e) {
@@ -95,6 +101,10 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
                 resultClass = Class.forName("com.asoee.smartdrive." + className);
                 Constructor constructor = resultClass.getConstructor(String.class, Activity.class);
                 action = (Action) constructor.newInstance(sentence, thisActivity);
+                if (action instanceof Music)
+                    musicAction = (Music) action;
+                else
+                    musicAction = null;
             } catch (Exception e) {
                 e.printStackTrace();
             }

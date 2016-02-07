@@ -267,6 +267,12 @@ public class Music extends Action {
         player.start();
     }
 
+    public void pause() {
+        if (player != null)
+            if (!player.isPlaying())
+                player.pause();
+    }
+
     @Override
     protected boolean inputCheck(String input) {
         return false;
