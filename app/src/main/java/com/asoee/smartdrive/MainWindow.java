@@ -86,7 +86,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
             //Retrieve the user's answer to the approval
             if (action != null) {
                 if (action.dialog(thingsYouSaid.get(0).toLowerCase()))
-                    action = null;
+                    destroyAction();
                 return;
             }
             VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
@@ -195,7 +195,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         if (approval)
             answer();
         else
-            action = null;
+            destroyAction();
 
     }
 
@@ -208,6 +208,12 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
         } catch (Exception e) {
             Toast.makeText(this, "Error initializing speech to text engine.", Toast.LENGTH_LONG).show();
         }
+    }
+
+    protected void destroyAction() {
+        if (action instanceof Music)
+            musicAction = null;
+        action = null;
     }
 
 }
