@@ -148,16 +148,17 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
                 mTts.speak("Welcome! Tap on the screen and tell me how i can help you!",
                         TextToSpeech.QUEUE_FLUSH, null, null);
             else {
-                pref.edit().putBoolean("init", true).commit();
+                pref.edit().putBoolean("init", true).apply();
                 String greeting = "";
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(getResources().openRawResource(
                             getResources().getIdentifier("raw/first_greet",
                                     "raw", getPackageName()))));
-                    String line = br.readLine().trim();
+                    String line = br.readLine();
                     do {
+                        line = line.trim();
                         greeting += line;
-                        line = br.readLine().trim();
+                        line = br.readLine();
                     } while (line != null && line.length() != 0);
                 } catch (Exception ignore) {
                 }
