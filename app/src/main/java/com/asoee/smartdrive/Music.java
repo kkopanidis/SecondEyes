@@ -31,11 +31,9 @@ public class Music extends Action {
      *
      * @param sentence the sentence given
      */
-    //TODO CHECK YOUR CALLS. ANALYZE SENTENCE WILL BE CALLED TWICE!(FIX NEEDED)
     public Music(String sentence, Activity callback) {
         super(sentence, callback);
         music = new HashMap<>();
-        analyzeSentence();
         populateMusic(); //to check if its best after or before analyzeSentence or dialog in terms of
         //usability
     }
@@ -89,7 +87,7 @@ public class Music extends Action {
      */
     @Override
     protected void analyzeSentence() {
-        String[] tokens = sentence.split(" ");
+        String[] tokens = sentence.split("\\s+");
         String word;
         //let's assume (s)he'll choose a song and not something containing the artist, album, or all of them
         for (int i = 0; i < tokens.length; ++i) {
