@@ -8,16 +8,12 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -27,8 +23,8 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     public static boolean approval = false;
     HashMap<String, String> keywords = new HashMap<>();
     Action action;
-    private TextToSpeech mTts;
     Vibrator v;
+    private TextToSpeech mTts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +43,8 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     }
 
     public void onClickSpeechDetection(View view) {
-        // Vibrate for 500 milliseconds
-        v.vibrate(500);//*/
+        // Vibrate for 300 milliseconds
+        v.vibrate(300);//*/
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
         try {
