@@ -1,4 +1,4 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
 import android.widget.Toast;
 
@@ -27,6 +28,12 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     Vibrator v;
     private TextToSpeech mTts;
     private boolean locked = false;
+    private final HashMap<String, String> params;
+
+    {
+        params = new HashMap<String, String>();
+        params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "talky");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +56,12 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
             return;
         // Vibrate for 300 milliseconds
         v.vibrate(300);//*/
-        Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
-
-        if (musicAction != null) {
+        if (musicAction != null && musicAction.isPLaying) {
             musicAction.pause();
+            musicAction = null;
         }
+        answer();
 
-        try {
-            startActivityForResult(i, 1);
-        } catch (Exception e) {
-            Toast.makeText(this, "Error initializing speech to text engine.", Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override
@@ -89,18 +90,28 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
                     destroyAction();
                 return;
             }
-            VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
-            if (voiceResult == null)
+            if (thingsYouSaid.get(0).toLowerCase().contains("help")
+                    || thingsYouSaid.get(0).toLowerCase().contains("assist")) {
+                help();
                 return;
+            }
+            VocalResult voiceResult = analyzeVocalCommand(thingsYouSaid);
+            if (voiceResult == null) {
+                help();
+                return;
+            }
+
             String sentence = voiceResult.getSentence();
             MainWindow thisActivity = this;
             String className = voiceResult.getKeyword();
             className = className.substring(0, 1).toUpperCase() + className.substring(1); //Capitalize first letter
             Class resultClass = null;
             try {
-                resultClass = Class.forName("com.asoee.smartdrive." + className);
+                resultClass = Class.forName("com.asoee.secondeyes." + className);
                 Constructor constructor = resultClass.getConstructor(String.class, Activity.class);
                 action = (Action) constructor.newInstance(sentence, thisActivity);
+                if (action instanceof DateTime || action instanceof Map)
+                    destroyAction();
                 if (action instanceof Music)
                     musicAction = (Music) action;
                 else
@@ -152,34 +163,37 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
-            SharedPreferences pref = getSharedPreferences("com.asoee.smartdrive", MODE_PRIVATE);
-            if (pref.contains("init")) {
-                locked = true;
-                mTts.speak("Welcome! Tap on the screen and tell me how i can help you!",
-                        TextToSpeech.QUEUE_FLUSH, null, null);
-                while (mTts.isSpeaking()) ; //jesus fuck..
-                locked = false;
-            } else {
-                pref.edit().putBoolean("init", true).apply();
-                String greeting = "";
-                try {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(getResources().openRawResource(
-                            getResources().getIdentifier("raw/first_greet",
-                                    "raw", getPackageName()))));
-                    String line = br.readLine();
-                    do {
-                        line = line.trim();
-                        greeting += line;
-                        line = br.readLine();
-                    } while (line != null && line.length() != 0);
-                } catch (Exception ignore) {
+            mTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {
+                    locked = true;
+                    // Nothing
                 }
 
-                locked = true;
+                @Override
+                public void onError(String utteranceId) {
+                    // Nothing
+                }
+
+                @Override
+                public void onDone(String utteranceId) {
+                    locked = false;
+                    // Restart recognizer here
+                    if (approval)
+                        answer();
+                }
+            });
+            SharedPreferences pref = getSharedPreferences("com.asoee.smartdrive", MODE_PRIVATE);
+            if (pref.contains("init")) {
+                mTts.speak("Welcome! Tap on the screen and tell me how i can help you!",
+                        TextToSpeech.QUEUE_FLUSH, null, "talky");
+            } else {
+                pref.edit().putBoolean("init", true).apply();
+                String greeting = read("first_greet");
+                greeting += read("help");
+
                 mTts.speak(greeting,
-                        TextToSpeech.QUEUE_FLUSH, null, null);
-                while (mTts.isSpeaking()) ; //jesus fuck..
-                locked = false;
+                        TextToSpeech.QUEUE_FLUSH, null, "talky");
             }
 
         }
@@ -187,14 +201,9 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
 
     public void approveAction(String approval_request, boolean approval) {
         MainWindow.approval = approval;
-        locked = true;
         mTts.speak(approval_request,
-                TextToSpeech.QUEUE_FLUSH, null, null);
-        while (mTts.isSpeaking()) ; //jesus fuck..
-        locked = false;
-        if (approval)
-            answer();
-        else
+                TextToSpeech.QUEUE_ADD, null, "talky");
+        if (!approval)
             destroyAction();
 
     }
@@ -202,7 +211,7 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     public void answer() {
         approval = false;
         Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-UK");
         try {
             startActivityForResult(i, 1);
         } catch (Exception e) {
@@ -211,9 +220,30 @@ public class MainWindow extends Activity implements TextToSpeech.OnInitListener 
     }
 
     protected void destroyAction() {
-        if (action instanceof Music)
-            musicAction = null;
         action = null;
     }
 
+    protected void help() {
+        String help = read("help");
+        mTts.speak(help,
+                TextToSpeech.QUEUE_FLUSH, null, "talky");
+
+    }
+
+    protected String read(String name) {
+        String result = "";
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(getResources().openRawResource(
+                    getResources().getIdentifier("raw/" + name,
+                            "raw", getPackageName()))));
+            String line = br.readLine();
+            do {
+                line = line.trim();
+                result += line;
+                line = br.readLine();
+            } while (line != null && line.length() != 0);
+        } catch (Exception ignore) {
+        }
+        return result;
+    }
 }

@@ -1,4 +1,4 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 import android.app.Activity;
 import android.content.Context;
@@ -73,11 +73,11 @@ public class Map extends Action {
         try {
             List<Address> addresses = geocoder.getFromLocation(currentLocation.getLatitude(), currentLocation.getLongitude(), 1);
             if (addresses != null && addresses.size() > 0) {
-                ((MainWindow)callback)
+                ((MainWindow) callback)
                         .approveAction("You're on " + convertToLatin(addresses.get(0).getAddressLine(0)), false);
             }
         } catch (IOException ioe) {
-            //MainWindow.activity.approveAction("Sorry, couldn't find your location. Try again." ,false);
+            ((MainWindow) callback).approveAction("I am sorry, but i could not find your location.", false);
         }
     }
 

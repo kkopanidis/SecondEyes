@@ -10,8 +10,8 @@ set alarm
 message message
 text message
 send message
-time time
-date time
+time dateTime
+date dateTime
 help help
 emergency help
 yes yes

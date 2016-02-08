@@ -1,4 +1,4 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 public class VocalResult {
 

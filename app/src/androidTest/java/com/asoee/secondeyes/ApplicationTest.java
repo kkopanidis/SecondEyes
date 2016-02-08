@@ -1,4 +1,4 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

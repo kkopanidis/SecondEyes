@@ -1,4 +1,4 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 import android.app.Activity;
 import android.text.format.Time;
@@ -23,7 +23,6 @@ public class DateTime extends Action {
         if (sentence_proc.contains("date"))
             isDate = true;
         executeCommand();
-        ((MainWindow)callback).action = null;
     }
 
     @Override
@@ -41,8 +40,8 @@ public class DateTime extends Action {
         if (isTime && isDate) {
             tell = "Today is " + c.getDisplayName(Calendar.DAY_OF_WEEK,
                     Calendar.LONG, Locale.getDefault()) + " " + c.get(Calendar.DAY_OF_MONTH)
-                    + " " + c.get(Calendar.DAY_OF_MONTH) + " " + c.get(Calendar.MONTH)
-                    + " " + c.get(Calendar.YEAR) + " and the time is " + now.hour + ":" + now.minute;
+                    + "/" + c.get(Calendar.MONTH) + "/" + c.get(Calendar.YEAR)
+                    + " and the time is " + now.hour + ":" + now.minute;
         } else if (isDate) {
             tell = "Today is " + c.getDisplayName(Calendar.DAY_OF_WEEK,
                     Calendar.LONG, Locale.getDefault()) + " " + c.get(Calendar.DAY_OF_MONTH)
@@ -52,7 +51,7 @@ public class DateTime extends Action {
         } else
             return;
 
-        ((MainWindow)callback).approveAction(tell, false);
+        ((MainWindow) callback).approveAction(tell, false);
 
     }
 

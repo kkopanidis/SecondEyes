@@ -1,8 +1,7 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 import android.app.Activity;
 import android.database.Cursor;
-import android.net.Uri;
 import android.provider.ContactsContract;
 import android.telephony.SmsManager;
 
@@ -22,7 +21,6 @@ public class Message extends Action {
      */
     public Message(String sentence, Activity callback) {
         super(sentence, callback);
-        //dialog("");
     }
 
     @Override
@@ -162,12 +160,15 @@ public class Message extends Action {
 
     @Override
     protected boolean dialog(String answer) {
-        if (answer.equals("cancel")) {
+        if (answer.trim().equalsIgnoreCase("cancel")
+                || answer.trim().equalsIgnoreCase("cancelled")
+                || answer.trim().equalsIgnoreCase("canceled")) {
+
             ((MainWindow) callback).approveAction("Cancelled!"
                     , false);
             return true;
         }
-        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
+        if (!answer.equals("") && !answer.contains("yes") && !answer.contains("no")) {
             switch (dialog_step) {
                 case 1:
                     if (inputCheck(answer)) {
@@ -188,7 +189,7 @@ public class Message extends Action {
                             , true);
                     return false;
             }
-        } else if (answer.equalsIgnoreCase("no")) {
+        } else if (answer.contains("no")) {
             if (dialog_step == 0 && this.contactName.equals("")) {
                 return true;
             }
@@ -196,7 +197,7 @@ public class Message extends Action {
                     " what would you like it to be?"
                     , true);
             return false;
-        } else if (answer.equalsIgnoreCase("yes") && dialog_step == 1 && mode == 0) {
+        } else if (answer.contains("yes") && dialog_step == 1 && mode == 0) {
             getContacts();
             if (!contacts.containsKey(this.contactName)) {
                 ((MainWindow) callback).approveAction("Sorry but i could not " +
@@ -273,19 +274,18 @@ public class Message extends Action {
 
     void getContacts() {
         contacts = new HashMap<>();
-        //Cursor contacts = callback.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null);
 
-        try ( //advanced Java 7.0+ Project Coin resource management
-              Cursor contacts = callback.getContentResolver()
-                      .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null)
+        try (
+                Cursor contacts = callback.getContentResolver()
+                        .query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, null, null, null)
         ) {
-            if (contacts == null) return; //maybe assert contacts != null; ??
+            if (contacts == null) return;
             while (contacts.moveToNext()) {
                 String name = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)).toLowerCase();
                 String phoneNumber = contacts.getString(contacts.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                 this.contacts.put(name.toLowerCase(), phoneNumber);
             }
-        } // contacts if going to be closed anyway
+        }
     }
 
 }

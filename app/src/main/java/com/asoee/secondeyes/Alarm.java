@@ -1,4 +1,4 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -45,7 +45,7 @@ public class Alarm extends Action {
                     , false);
             return true;
         }
-        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
+        if (!answer.equals("") && !answer.contains("yes") && !answer.contains("no")) {
             switch (dialog_step) {
                 case 1:
                     if (inputCheck(answer)) {
@@ -60,7 +60,7 @@ public class Alarm extends Action {
                     }
                     return false;
             }
-        } else if (answer.equalsIgnoreCase("no")) {
+        } else if (answer.contains("no")) {
             ((MainWindow) callback).approveAction("Oh, it seems i was wrong," +
                     " what would you like it to be?"
                     , true);
@@ -102,8 +102,8 @@ public class Alarm extends Action {
         if (input.equals(""))
             return false;
         if (input.contains("and"))
-            input.replace("and", ":");
-        input.replaceAll(" ", "");
+            input = input.replace("and", ":");
+        input = input.replaceAll(" ", "");
         if (!input.contains(":"))
             return false;
         for (char c : input.toCharArray()) {

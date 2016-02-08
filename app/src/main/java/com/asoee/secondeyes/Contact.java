@@ -1,4 +1,4 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 import android.app.Activity;
 import android.content.ContentProviderOperation;
@@ -68,7 +68,7 @@ public class Contact extends Action {
                     , false);
             return true;
         }
-        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
+        if (!answer.equals("") && !answer.contains("yes") && !answer.contains("no")) {
             switch (dialog_step) {
                 case 1:
                     if (inputCheck(answer)) {
@@ -95,7 +95,7 @@ public class Contact extends Action {
                     }
                     return false;
             }
-        } else if (answer.equalsIgnoreCase("no")) {
+        } else if (answer.contains("no")) {
             if (dialog_step == 0)
                 return true;
             dialog_step = 0;
@@ -179,7 +179,7 @@ public class Contact extends Action {
 
     protected boolean numberInputCheck(String input) {
         for (char c : input.toCharArray()) {
-            if ((Character.isAlphabetic(c) || !Character.isDigit(c)) && c != '-')
+            if (Character.isAlphabetic(c))
                 return false;
         }
         return true;

@@ -1,4 +1,4 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import android.provider.ContactsContract;
 public class Call extends Action {
     String name;
     String number;
-    int mode = 0;
+    int mode;
 
     /**
      * Does constructor stuff
@@ -51,7 +51,7 @@ public class Call extends Action {
                     , false);
             return true;
         }
-        if (!answer.equals("") && !answer.equalsIgnoreCase("yes") && !answer.equalsIgnoreCase("no")) {
+        if (!answer.equals("") && !answer.contains("yes") && !answer.contains("no")) {
             switch (dialog_step) {
                 case 1:
                     if (inputCheck(answer)) {
@@ -66,10 +66,10 @@ public class Call extends Action {
                     }
                     return false;
             }
-        } else if (answer.equalsIgnoreCase("no")) {
+        } else if (answer.contains("no")) {
             if (dialog_step == 0)
                 return true;
-            ((MainWindow) callback).approveAction("Hm i thought i got it right," +
+            ((MainWindow) callback).approveAction("oh!I thought i got it right," +
                     " can you repeat the name again?"
                     , true);
             return false;

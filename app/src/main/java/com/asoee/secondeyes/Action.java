@@ -1,8 +1,7 @@
-package com.asoee.smartdrive;
+package com.asoee.secondeyes;
 
 
 import android.app.Activity;
-import android.content.Intent;
 
 public abstract class Action {
 
